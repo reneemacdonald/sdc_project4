@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-
+import glob
 
 
 #clip1= cv2.VideoCapture('project_video.mp4')
@@ -26,8 +26,7 @@ def warp(img):
 	M = cv2.getPerspectiveTransform(src, dst)
 
 	warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
-    
-    #return warped
+	return warped
 
 def process_video(clip1):
 
@@ -177,9 +176,61 @@ def find_the_lines(binary_warped):
 
 	plt.show()
 
+def camera_calibration(images):
+	# Arrays to store object points and image points from all the images
+
+	objpoints = [] # 3D points in real world space
+	imgpoints = [] # 2D poitns in image plane
+
+	# Change thig becauase not 6x8, 9x6 instead
+	objp = np.zeros((6*9,3), np.float32)
+	objp[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2) # x, y coordinates
+
+	for img in images:
+		gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+		ret, corners = cv2.findChessboardCorners(gray, (9,6), None)
+
+		if ret == True:
+			imgpoints.append(corners)
+			objpoints.append(objp)
+
+			img_corners = cv2.drawChessboardCorners(img, (9,6), corners, ret)
+			plt.imshow(img_corners)
+			plt.show()
+		else:
+			print ("No corners found")
+
+
+image_array = []
+path ='camera_cal/*.jpg'
+images = glob.glob(path)
+for image in images:
+	img = cv2.imread(image)
+	#plt.imshow(img)
+	#plt.show()
+	image_array.append(img)
+
+camera_calibration(image_array)
+
+#@def camera_calibration():
 
 
 
-process_video(image1)
+
+#process_video(image1)
 #find_the_lines(color_and_gradient)
-exit()
+#exit()
+'''warped_im = warp(image1)
+f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
+ax1.set_title('Source Image')
+ax1.imshow(image1)
+
+ax2.set_title('Warped Image')
+plt.imshow(warped_im)
+plt.show()
+'''
+
+
+
+
