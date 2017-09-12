@@ -3,6 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import glob
+import os 
 
 
 #clip1= cv2.VideoCapture('project_video.mp4')
@@ -180,7 +181,7 @@ def find_the_lines(binary_warped):
 
 	plt.show()
 
-def camera_calibration(images):
+def camera_calibration(images, image_name):
 	# Arrays to store object points and image points from all the images
 
 
@@ -201,19 +202,25 @@ def camera_calibration(images):
 			
 			plt.imshow(img_corners)
 			plt.show()
-			undistortion(objpoints, imgpoints, img_corners)
+			undistortion(objpoints, imgpoints, img_corners, image_name)
 			i = i + 1
 		else:
 			print ("No corners found")
 
-def undistortion(objpoints, imgpoints, img):
+def undistortion(objpoints, imgpoints, img, image_name):
 	img_size = (img.shape[1], img.shape[0])
 
 	ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, img_size, None, None)
 
 	dst = cv2.undistort(img, mtx, dist, None, mtx)
 
-	cv2.imwrite('camera_cal/image.jpg', dst)
+	name, ext = os.path.splitext(image_name)
+	#print ("name ", name)
+	#print ("ext ", ext)
+
+	#os.rename(image_name, 'undistorted/' + name + '_undistorted' + ext)
+	cv2.imwrite('unidstorted/'+name + '_undistorted' + ext, dst)
+
 	#f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
 	#ax1.imshow(img)
 	#ax1.set_title('Original Image', fontsize=30)
@@ -228,12 +235,13 @@ path ='camera_cal/*.jpg'
 images = glob.glob(path)
 for image in images:
 	img = cv2.imread(image)
+	#print ("image", image)
 	#plt.imshow(img)
 	#plt.show()
 	image_array.append(img)
 
 
-camera_calibration(image_array)
+camera_calibration(image_array, image)
 #undistortion(objpoints, imgpoints, image)
 
 #@def camera_calibration():
