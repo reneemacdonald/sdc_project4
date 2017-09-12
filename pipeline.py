@@ -6,7 +6,11 @@ import glob
 
 
 #clip1= cv2.VideoCapture('project_video.mp4')
-image1 = mpimg.imread('straight_lines1.jpg')
+image1 = mpimg.imread('camera_cal/calibration3.jpg')
+
+
+objpoints = [] # 3D points in real world space
+imgpoints = [] # 2D poitns in image plane
 
 def warp(img):
 	img_size = (img.shape[1], img.shape[0])
@@ -179,13 +183,11 @@ def find_the_lines(binary_warped):
 def camera_calibration(images):
 	# Arrays to store object points and image points from all the images
 
-	objpoints = [] # 3D points in real world space
-	imgpoints = [] # 2D poitns in image plane
 
 	# Change thig becauase not 6x8, 9x6 instead
 	objp = np.zeros((6*9,3), np.float32)
 	objp[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2) # x, y coordinates
-
+	i = 0
 	for img in images:
 		gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -194,12 +196,31 @@ def camera_calibration(images):
 		if ret == True:
 			imgpoints.append(corners)
 			objpoints.append(objp)
-
+			
 			img_corners = cv2.drawChessboardCorners(img, (9,6), corners, ret)
+			
 			plt.imshow(img_corners)
 			plt.show()
+			undistortion(objpoints, imgpoints, img_corners)
+			i = i + 1
 		else:
 			print ("No corners found")
+
+def undistortion(objpoints, imgpoints, img):
+	img_size = (img.shape[1], img.shape[0])
+
+	ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, img_size, None, None)
+
+	dst = cv2.undistort(img, mtx, dist, None, mtx)
+
+	cv2.imwrite('camera_cal/image.jpg', dst)
+	#f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
+	#ax1.imshow(img)
+	#ax1.set_title('Original Image', fontsize=30)
+	plt.imshow(dst)
+	plt.show()
+	#ax2.set_title('Undistorted Image', fontsize=30)
+
 
 
 image_array = []
@@ -211,7 +232,9 @@ for image in images:
 	#plt.show()
 	image_array.append(img)
 
+
 camera_calibration(image_array)
+#undistortion(objpoints, imgpoints, image)
 
 #@def camera_calibration():
 
