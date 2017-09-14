@@ -181,15 +181,16 @@ def find_the_lines(binary_warped):
 
 	plt.show()
 
-def camera_calibration(images, image_name):
+def camera_calibration(images):
 	# Arrays to store object points and image points from all the images
 
 
 	# Change thig becauase not 6x8, 9x6 instead
+	#print ("image ", image_name)
 	objp = np.zeros((6*9,3), np.float32)
 	objp[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2) # x, y coordinates
 	i = 0
-	for img in images:
+	for img, image_name in images:
 		gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 		ret, corners = cv2.findChessboardCorners(gray, (9,6), None)
@@ -219,7 +220,7 @@ def undistortion(objpoints, imgpoints, img, image_name):
 	#print ("ext ", ext)
 
 	#os.rename(image_name, 'undistorted/' + name + '_undistorted' + ext)
-	cv2.imwrite('unidstorted/'+name + '_undistorted' + ext, dst)
+	cv2.imwrite('undistorted/'+name + '_undistorted' + ext, dst)
 
 	#f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
 	#ax1.imshow(img)
@@ -238,10 +239,14 @@ for image in images:
 	#print ("image", image)
 	#plt.imshow(img)
 	#plt.show()
-	image_array.append(img)
+	image_array.append((img, image))
 
 
-camera_calibration(image_array, image)
+camera_calibration(image_array)
+
+# Tues - color/gradient threshold
+
+
 #undistortion(objpoints, imgpoints, image)
 
 #@def camera_calibration():
