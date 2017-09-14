@@ -7,7 +7,7 @@ import os
 
 
 #clip1= cv2.VideoCapture('project_video.mp4')
-image1 = mpimg.imread('camera_cal/calibration3.jpg')
+image1 = mpimg.imread('test_images/straight_lines1.jpg')
 
 
 objpoints = [] # 3D points in real world space
@@ -33,50 +33,56 @@ def warp(img):
 	warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
 	return warped
 
-def process_video(clip1):
+def process_video(lines_array):
 
+	print ("inside process video")
+	
+	for image in lines_array:
+		
 
 	#while (clip1.isOpened()):
 	#	ret, frame = clip1.read()
 
-	hls = cv2.cvtColor(clip1, cv2.COLOR_RGB2HLS)
-	s_channel = hls[:,:,2]
+		hls = cv2.cvtColor(image, cv2.COLOR_BGR2HLS)
+		s_channel = hls[:,:,2]
 
-	frame = np.copy(clip1)
+		frame = np.copy(image)
 
-	gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+		gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-	sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0)
-	abs_sobelx = np.absolute(sobelx)
-	scaled_sobel = np.uint8(255*abs_sobelx/np.max(abs_sobelx))
+		sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0)
+		abs_sobelx = np.absolute(sobelx)
+		scaled_sobel = np.uint8(255*abs_sobelx/np.max(abs_sobelx))
 
-	thresh_min = 20
-	thresh_max = 100
-	sxbinary = np.zeros_like(scaled_sobel)
-	sxbinary[(scaled_sobel >= thresh_min) & (scaled_sobel <= thresh_max)]
+		thresh_min = 20
+		thresh_max = 100
+		sxbinary = np.zeros_like(scaled_sobel)
+		sxbinary[(scaled_sobel >= thresh_min) & (scaled_sobel <= thresh_max)]
 
-	s_thresh_min = 170
-	s_thresh_max = 255
-	s_binary = np.zeros_like(s_channel)
-	s_binary[(s_channel >= s_thresh_min) & (s_channel <= s_thresh_max)] = 1
+		s_thresh_min = 170
+		s_thresh_max = 255
+		s_binary = np.zeros_like(s_channel)
+		s_binary[(s_channel >= s_thresh_min) & (s_channel <= s_thresh_max)] = 1
 
-	color_binary = np.dstack((np.zeros_like(sxbinary), sxbinary, s_binary))
+		color_binary = np.dstack((np.zeros_like(sxbinary), sxbinary, s_binary))
 
-	combined_binary = np.zeros_like(sxbinary)
-	combined_binary[(s_binary ==1) | (sxbinary == 1)] = 1
+		combined_binary = np.zeros_like(sxbinary)
+		combined_binary[(s_binary ==1) | (sxbinary == 1)] = 1
 
 	#cv2.imshow('frame', scaled_sobel)
 
 	# Plotting thresholded images
-	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
-	ax1.set_title('Stacked thresholds')
-	ax1.imshow(color_binary)
-
-	ax2.set_title('Combined S channel and gradient thresholds')
-	ax2.imshow(combined_binary, cmap='gray')
+		f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
+		ax1.set_title('Stacked thresholds')
+		ax1.imshow(color_binary)
 
 
-	find_the_lines(scaled_sobel)
+		ax2.set_title('Combined S channel and gradient thresholds')
+		ax2.imshow(combined_binary, cmap='gray')
+		plt.show()
+
+
+	#find_the_lines(scaled_sobel)
 
 		
 	
@@ -93,7 +99,7 @@ def find_the_lines(binary_warped):
 	# Assuming you have created a warped binary image called "binary_warped"
 	# Take a histogram of the bottom half of the image
 	histogram = np.sum(binary_warped[binary_warped.shape[0]//2:,:], axis=0)
-	# Create an output image to draw on and  visualize the result
+	# Crxeate an output image to draw on and  visualize the result
 	out_img = np.dstack((binary_warped, binary_warped, binary_warped))*255
 	# Find the peak of the left and right halves of the histogram
 	# These will be the starting point for the left and right lines
@@ -229,8 +235,8 @@ def undistortion(objpoints, imgpoints, img, image_name):
 	plt.show()
 	#ax2.set_title('Undistorted Image', fontsize=30)
 
-
-
+#commenting out because testing out other areas
+'''
 image_array = []
 path ='camera_cal/*.jpg'
 images = glob.glob(path)
@@ -240,7 +246,7 @@ for image in images:
 	#plt.imshow(img)
 	#plt.show()
 	image_array.append((img, image))
-
+print (image_array)
 
 camera_calibration(image_array)
 
@@ -251,10 +257,19 @@ camera_calibration(image_array)
 
 #@def camera_calibration():
 
+'''
 
+lines_array = []
+lines_path = 'test_images/*.jpg'
+lines_images = glob.glob(lines_path)
+for lines_image in lines_images:
+	img = cv2.imread(lines_image)
+	print (type(img))
+	lines_array.append(img)
+	#plt.imshow(img)
+	#plt.show()
 
-
-#process_video(image1)
+process_video(lines_array)
 #find_the_lines(color_and_gradient)
 #exit()
 '''warped_im = warp(image1)
