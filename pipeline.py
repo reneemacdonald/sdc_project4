@@ -14,24 +14,34 @@ objpoints = [] # 3D points in real world space
 imgpoints = [] # 2D poitns in image plane
 
 def warp(img):
-	img_size = (img.shape[1], img.shape[0])
 
+		
+	img_size = (img.shape[1], img.shape[0])
+	
 	src = np.float32(
-		[[850, 320],
-		[865, 450],
-		[533, 250],
-		[535, 210]])
+		[[210, 700],
+		[600, 450],
+		[700, 450],
+		[1100, 700]])
 
 	dst = np.float32(
-		[[870, 240],
-		[870, 370],
-		[520, 370],
-		[520, 240]])
+		[[350, 700],
+		[350, 0], 
+		[950, 0],
+		[950,  700]])
+
+    
 
 	M = cv2.getPerspectiveTransform(src, dst)
 
 	warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
-	return warped
+	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
+	ax1.set_title('warped')
+	ax1.imshow(img)
+	ax2.set_title('Warped again')
+	ax2.imshow(warped)
+	plt.show()
+	#return warped
 
 def process_video(lines_array):
 
@@ -80,6 +90,7 @@ def process_video(lines_array):
 		ax2.set_title('Combined S channel and gradient thresholds')
 		ax2.imshow(combined_binary, cmap='gray')
 		plt.show()
+		warp(combined_binary)
 
 
 	#find_the_lines(scaled_sobel)
@@ -269,7 +280,7 @@ for lines_image in lines_images:
 	#plt.imshow(img)
 	#plt.show()
 
-process_video(lines_array)
+#process_video(lines_array)
 #find_the_lines(color_and_gradient)
 #exit()
 '''warped_im = warp(image1)
@@ -281,6 +292,10 @@ ax2.set_title('Warped Image')
 plt.imshow(warped_im)
 plt.show()
 '''
+warp(image1)
+
+
+# To do work on teh warp image next - perspective transform thurs then fri work on lane lines
 
 
 
