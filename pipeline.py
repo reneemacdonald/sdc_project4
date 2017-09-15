@@ -280,10 +280,11 @@ for lines_image in lines_images:
 	#plt.imshow(img)
 	#plt.show()
 
-#process_video(lines_array)
+process_video(lines_array)
 #find_the_lines(color_and_gradient)
 #exit()
-'''warped_im = warp(image1)
+'''
+warped_im = warp(image1)
 f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
 ax1.set_title('Source Image')
 ax1.imshow(image1)
@@ -291,8 +292,10 @@ ax1.imshow(image1)
 ax2.set_title('Warped Image')
 plt.imshow(warped_im)
 plt.show()
+
+#warp(image1)
+
 '''
-warp(image1)
 
 
 # To do work on teh warp image next - perspective transform thurs then fri work on lane lines
