@@ -41,7 +41,7 @@ def warp(img):
 	ax2.set_title('Warped again')
 	ax2.imshow(warped)
 	plt.show()
-	#return warped
+	find_the_lines(warped)
 
 def process_video(lines_array):
 
@@ -300,6 +300,12 @@ plt.show()
 
 # To do work on teh warp image next - perspective transform thurs then fri work on lane lines
 
+
+# Fri chec that it's working on curved lines
+
+# work on detect lane lines
+
+# sat work on lane curvatue
 
 
 
