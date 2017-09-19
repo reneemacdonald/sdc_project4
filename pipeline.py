@@ -13,7 +13,7 @@ image1 = mpimg.imread('test_images/straight_lines1.jpg')
 objpoints = [] # 3D points in real world space
 imgpoints = [] # 2D poitns in image plane
 
-def warp(img):
+def warp(img, original_image):
 
 		
 	img_size = (img.shape[1], img.shape[0])
@@ -38,11 +38,11 @@ def warp(img):
 	warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
 	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
 	ax1.set_title('original')
-	ax1.imshow(img)
+	ax1.imshow(original_image)
 	ax2.set_title('Warped again')
 	ax2.imshow(warped)
 	plt.show()
-	find_the_lines(img, warped, Minv)
+	find_the_lines(original_image, warped, Minv)
 
 def process_video(lines_array):
 
@@ -91,7 +91,7 @@ def process_video(lines_array):
 		ax2.set_title('Combined S channel and gradient thresholds')
 		ax2.imshow(combined_binary, cmap='gray')
 		plt.show()
-		warped=warp(combined_binary)
+		warped=warp(combined_binary, image)
 		
 
 
@@ -107,7 +107,7 @@ def process_video(lines_array):
 	#clip1.release()
 	#cv2.destroyAllWindows()
 
-def find_the_lines(img, binary_warped, Minv):
+def find_the_lines(original_image, binary_warped, Minv):
 	#print (binary_warped.shape)
 	# Assuming you have created a warped binary image called "binary_warped"
 	# Take a histogram of the bottom half of the image
@@ -199,7 +199,7 @@ def find_the_lines(img, binary_warped, Minv):
 	plt.ylim(720, 0)
 
 	plt.show()
-	measuring_curvature(img, binary_warped, Minv)
+	measuring_curvature(original_image, binary_warped, Minv)
 
 def camera_calibration(images):
 	# Arrays to store object points and image points from all the images
@@ -250,7 +250,7 @@ def undistortion(objpoints, imgpoints, img, image_name):
 	plt.show()
 	#ax2.set_title('Undistorted Image', fontsize=30)
 
-def measuring_curvature(img, warped, Minv):
+def measuring_curvature(original_image, warped, Minv):
 	# Generate some fake data to represent lane-line pixels
 	ploty = np.linspace(0, 719, num=720)# to cover same y-range as image
 	quadratic_coeff = 3e-4 # arbitrary quadratic coefficient
@@ -287,10 +287,11 @@ def measuring_curvature(img, warped, Minv):
 	y_eval = np.max(ploty)
 	left_curverad = ((1 + (2*left_fit[0]*y_eval + left_fit[1])**2)**1.5) / np.absolute(2*left_fit[0])
 	right_curverad = ((1 + (2*right_fit[0]*y_eval + right_fit[1])**2)**1.5) / np.absolute(2*right_fit[0])
-	print(left_curverad, right_curverad)
+	print("left curved", left_curverad, right_curverad)
 
 	# Create an image to draw the lines on
-	warp_zero = np.zeros_like(warped).astype(np.uint8)
+	#warp_zero = np.zeros_like(warped).astype(np.uint8)
+	warp_zero = np.zeros_like(warped)
 	color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
 
 	# Recast the x and y points into usable format for cv2.fillPoly()
@@ -302,9 +303,17 @@ def measuring_curvature(img, warped, Minv):
 	cv2.fillPoly(color_warp, np.int_([pts]), (0,255, 0))
 
 	# Warp the blank back to original image space using inverse perspective matrix (Minv)
-	newwarp = cv2.warpPerspective(color_warp, Minv, (image.shape[1], image.shape[0])) 
+	
+	#print ("image shape", img.shape[1])
+	newwarp = cv2.warpPerspective(color_warp, Minv, (1280, 720), flags=cv2.INTER_LINEAR) 
+	print ("new warp image shape", newwarp.shape)
+	#print ("new warp image shape", newwarp_resized.shape)
 	# Combine the result with the original image
-	result = cv2.addWeighted(img, 1, newwarp, 0.3, 0)
+	#newwarp_resized = newwarp.shape[1::-1]
+	#print ("new warp resized", newwarp_resized)
+	result = cv2.addWeighted(original_image, 1, newwarp, 0.3, 0)
+	plt.imshow(original_image)
+	#plt.imshow(newwarp)
 	plt.imshow(result)
 	plt.show()
 
