@@ -37,11 +37,12 @@ def warp(img, original_image):
 
 	warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
 	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
-	ax1.set_title('original')
+	'''ax1.set_title('original')
 	ax1.imshow(original_image)
 	ax2.set_title('Warped again')
 	ax2.imshow(warped)
 	plt.show()
+	'''
 	find_the_lines(original_image, warped, Minv)
 
 def process_video(lines_array):
@@ -83,15 +84,18 @@ def process_video(lines_array):
 	#cv2.imshow('frame', scaled_sobel)
 
 	# Plotting thresholded images
+		'''
 		f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
 		ax1.set_title('Stacked thresholds')
-		ax1.imshow(color_binary)
+		ax1.imshow(color_ binary)
 
 
 		ax2.set_title('Combined S channel and gradient thresholds')
 		ax2.imshow(combined_binary, cmap='gray')
 		plt.show()
+		'''
 		warped=warp(combined_binary, image)
+
 		
 
 
@@ -192,6 +196,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 	out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
 
 	#scv2.imshow('frame', out_img)
+	'''
 	plt.imshow(out_img)
 	plt.plot(left_fitx, ploty, color='yellow')
 	plt.plot(right_fitx, ploty, color='yellow')
@@ -199,6 +204,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 	plt.ylim(720, 0)
 
 	plt.show()
+	'''
 	measuring_curvature(original_image, binary_warped, Minv)
 
 def camera_calibration(images):
@@ -221,8 +227,8 @@ def camera_calibration(images):
 			
 			img_corners = cv2.drawChessboardCorners(img, (9,6), corners, ret)
 			
-			plt.imshow(img_corners)
-			plt.show()
+			#plt.imshow(img_corners)
+			#plt.show()
 			undistortion(objpoints, imgpoints, img_corners, image_name)
 			i = i + 1
 		else:
@@ -246,8 +252,8 @@ def undistortion(objpoints, imgpoints, img, image_name):
 	#f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
 	#ax1.imshow(img)
 	#ax1.set_title('Original Image', fontsize=30)
-	plt.imshow(dst)
-	plt.show()
+	#plt.imshow(dst)
+	#plt.show()
 	#ax2.set_title('Undistorted Image', fontsize=30)
 
 def measuring_curvature(original_image, warped, Minv):
@@ -256,9 +262,9 @@ def measuring_curvature(original_image, warped, Minv):
 	quadratic_coeff = 3e-4 # arbitrary quadratic coefficient
 	# For each y position generate random x position within +/-50 pix
 	# of the line base position in each case (x=200 for left, and x=900 for right)
-	leftx = np.array([200 + (y**2)*quadratic_coeff + np.random.randint(-50, high=51) 
+	leftx = np.array([400 + (y**2)*quadratic_coeff + np.random.randint(-50, high=51) 
 	                              for y in ploty])
-	rightx = np.array([900 + (y**2)*quadratic_coeff + np.random.randint(-50, high=51) 
+	rightx = np.array([950 + (y**2)*quadratic_coeff + np.random.randint(-50, high=51) 
 	                                for y in ploty])
 
 	leftx = leftx[::-1]  # Reverse to match top-to-bottom in y
@@ -272,6 +278,7 @@ def measuring_curvature(original_image, warped, Minv):
 	right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
 
 	# Plot up the fake data	
+	'''
 	mark_size = 3
 	plt.plot(leftx, ploty, 'o', color='red', markersize=mark_size)
 	plt.plot(rightx, ploty, 'o', color='blue', markersize=mark_size)
@@ -281,6 +288,7 @@ def measuring_curvature(original_image, warped, Minv):
 	plt.plot(right_fitx, ploty, color='green', linewidth=3)
 	plt.gca().invert_yaxis() # to visualize as we do the images
 	plt.show()
+	'''
 
 	# Define y-value where we want radius of curvature
 	# I'll choose the maximum y-value, corresponding to the bottom of the image
@@ -326,7 +334,7 @@ def measuring_curvature(original_image, warped, Minv):
 	#newwarp_resized = newwarp.shape[1::-1]
 	#print ("new warp resized", newwarp_resized)
 	result = cv2.addWeighted(original_image, 1, newwarp, 0.3, 0)
-	plt.imshow(original_image)
+	#plt.imshow(original_image)
 	#plt.imshow(newwarp)
 	plt.imshow(result)
 	plt.show()
