@@ -6,16 +6,16 @@ import glob
 import os 
 
 
-#clip1= cv2.VideoCapture('project_video.mp4')
+clip1= cv2.VideoCapture('project_video.mp4')
 image1 = mpimg.imread('test_images/straight_lines1.jpg')
 
-
+count = 0
 objpoints = [] # 3D points in real world space
 imgpoints = [] # 2D poitns in image plane
 
 def warp(img, original_image):
 
-		
+	
 	img_size = (img.shape[1], img.shape[0])
 	
 	src = np.float32(
@@ -36,7 +36,7 @@ def warp(img, original_image):
 	Minv = cv2.getPerspectiveTransform(dst, src)
 
 	warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
-	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
+	#f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
 	'''ax1.set_title('original')
 	ax1.imshow(original_image)
 	ax2.set_title('Warped again')
@@ -45,21 +45,19 @@ def warp(img, original_image):
 	'''
 	find_the_lines(original_image, warped, Minv)
 
-def process_video(lines_array):
-
-	print ("inside process video")
+def process_video(clip1):
 	
-	for image in lines_array:
+
+
+	#print ("inside process video")
+	
+	#for image in lines_array:
 		
 
-	#while (clip1.isOpened()):
-	#	ret, frame = clip1.read()
-
-		hls = cv2.cvtColor(image, cv2.COLOR_BGR2HLS)
+	while (clip1.isOpened()):
+		ret, frame = clip1.read()
+		hls = cv2.cvtColor(frame, cv2.COLOR_BGR2HLS)
 		s_channel = hls[:,:,2]
-
-		frame = np.copy(image)
-
 		gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 		sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0)
@@ -84,17 +82,17 @@ def process_video(lines_array):
 	#cv2.imshow('frame', scaled_sobel)
 
 	# Plotting thresholded images
-		'''
-		f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
-		ax1.set_title('Stacked thresholds')
-		ax1.imshow(color_ binary)
+		
+		#f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
+		#ax1.set_title('Stacked thresholds')
+		#ax1.imshow(color_ binary)
 
 
-		ax2.set_title('Combined S channel and gradient thresholds')
-		ax2.imshow(combined_binary, cmap='gray')
-		plt.show()
-		'''
-		warped=warp(combined_binary, image)
+		#ax2.set_title('Combined S channel and gradient thresholds')
+		#plt.imshow(combined_binary, cmap='gray')
+		#plt.show()
+		
+		warped=warp(combined_binary, frame)
 
 		
 
@@ -116,6 +114,12 @@ def find_the_lines(original_image, binary_warped, Minv):
 	# Assuming you have created a warped binary image called "binary_warped"
 	# Take a histogram of the bottom half of the image
 	histogram = np.sum(binary_warped[binary_warped.shape[0]//2:,:], axis=0)
+	'''
+	plt.plot(histogram)
+	plt.show()
+	plt.imshow(binary_warped)
+	plt.show()
+	'''
 	# Crxeate an output image to draw on and  visualize the result
 	out_img = np.dstack((binary_warped, binary_warped, binary_warped))*255
 	# Find the peak of the left and right halves of the histogram
@@ -199,11 +203,44 @@ def find_the_lines(original_image, binary_warped, Minv):
 	'''
 	plt.imshow(out_img)
 	plt.plot(left_fitx, ploty, color='yellow')
-	plt.plot(right_fitx, ploty, color='yellow')
+	plt.plot(left_fitx + 600, ploty, color='yellow')
 	plt.xlim(0, 1280)
 	plt.ylim(720, 0)
 
 	plt.show()
+	'''
+
+	# Create an image to draw on and an image to show the selection window
+	out_img = np.dstack((binary_warped, binary_warped, binary_warped))*255
+	window_img = np.zeros_like(out_img)
+	# Color in left and right line pixels
+	out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
+	out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
+
+	# Generate a polygon to illustrate the search window area
+	# And recast the x and y points into usable format for cv2.fillPoly()
+	left_line_window1 = np.array([np.transpose(np.vstack([left_fitx-margin, ploty]))])
+	left_line_window2 = np.array([np.flipud(np.transpose(np.vstack([left_fitx+margin, 
+	                              ploty])))])
+	left_line_pts = np.hstack((left_line_window1, left_line_window2))
+	right_line_window1 = np.array([np.transpose(np.vstack([right_fitx-margin, ploty]))])
+	right_line_window2 = np.array([np.flipud(np.transpose(np.vstack([right_fitx+margin, 
+	                              ploty])))])
+	right_line_pts = np.hstack((right_line_window1, right_line_window2))
+
+	# Draw the lane onto the warped blank image
+	cv2.fillPoly(window_img, np.int_([left_line_pts]), (0,255, 0))
+	cv2.fillPoly(window_img, np.int_([right_line_pts]), (0,255, 0))
+
+	result = cv2.addWeighted(out_img, 1, window_img, 0.3, 0)
+	'''
+	plt.imshow(result)
+	plt.plot(left_fitx, ploty, color='yellow')
+	# right lane sometimes isn't correctly determined 
+	# if left lane has a pretty strong boundary, shift over to draw the right lane
+	plt.plot(left_fitx + 600, ploty, color='yellow')
+	plt.xlim(0, 1280)
+	plt.ylim(720, 0)
 	'''
 	measuring_curvature(original_image, binary_warped, Minv)
 
@@ -264,7 +301,7 @@ def measuring_curvature(original_image, warped, Minv):
 	# of the line base position in each case (x=200 for left, and x=900 for right)
 	leftx = np.array([400 + (y**2)*quadratic_coeff + np.random.randint(-50, high=51) 
 	                              for y in ploty])
-	rightx = np.array([950 + (y**2)*quadratic_coeff + np.random.randint(-50, high=51) 
+	rightx = np.array([930 + (y**2)*quadratic_coeff + np.random.randint(-50, high=51) 
 	                                for y in ploty])
 
 	leftx = leftx[::-1]  # Reverse to match top-to-bottom in y
@@ -295,7 +332,7 @@ def measuring_curvature(original_image, warped, Minv):
 	y_eval = np.max(ploty)
 	left_curverad = ((1 + (2*left_fit[0]*y_eval + left_fit[1])**2)**1.5) / np.absolute(2*left_fit[0])
 	right_curverad = ((1 + (2*right_fit[0]*y_eval + right_fit[1])**2)**1.5) / np.absolute(2*right_fit[0])
-	print("left curved", left_curverad, right_curverad)
+	#print("left curved", left_curverad, right_curverad)
 
 	# Define conversions in x and y from pixels space to meters
 	ym_per_pix = 30/720 # meters per pixel in y dimension
@@ -308,7 +345,7 @@ def measuring_curvature(original_image, warped, Minv):
 	left_curverad = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])
 	right_curverad = ((1 + (2*right_fit_cr[0]*y_eval*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
 	# Now our radius of curvature is in meters
-	print(left_curverad, 'm', right_curverad, 'm')
+	#print(left_curverad, 'm', right_curverad, 'm')
 	# Example values: 632.1 m    626.2 m
 
 	# Create an image to draw the lines on
@@ -328,7 +365,7 @@ def measuring_curvature(original_image, warped, Minv):
 	
 	#print ("image shape", img.shape[1])
 	newwarp = cv2.warpPerspective(color_warp, Minv, (1280, 720), flags=cv2.INTER_LINEAR) 
-	print ("new warp image shape", newwarp.shape)
+	#print ("new warp image shape", newwarp.shape)
 	#print ("new warp image shape", newwarp_resized.shape)
 	# Combine the result with the original image
 	#newwarp_resized = newwarp.shape[1::-1]
@@ -336,8 +373,17 @@ def measuring_curvature(original_image, warped, Minv):
 	result = cv2.addWeighted(original_image, 1, newwarp, 0.3, 0)
 	#plt.imshow(original_image)
 	#plt.imshow(newwarp)
-	plt.imshow(result)
-	plt.show()
+	#plt.imshow(result)
+	#plt.show()
+	global count
+	count += 1
+	fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
+	height, width, dimensions = result.shape
+	#print ("result shape" ,result.shape)
+	out = cv2.VideoWriter('output.mp4', fourcc, 1, (width, height))
+	out.write(result)
+	cv2.imwrite("video_images/result%d.jpg" %count, result)
+
 
 
 # Example values: 1926.74 1908.48
@@ -371,12 +417,27 @@ lines_path = 'test_images/*.jpg'
 lines_images = glob.glob(lines_path)
 for lines_image in lines_images:
 	img = cv2.imread(lines_image)
-	print (type(img))
+	#print (type(img))
 	lines_array.append(img)
 	#plt.imshow(img)
 	#plt.show()
 
-process_video(lines_array)
+'''
+lines_array = []
+lines_path = 'test_images/straight_lines1.jpg'
+lines_images = glob.glob(lines_path)
+for lines_image in lines_images:
+	img = cv2.imread(lines_image)
+	print (type(img))
+	lines_array.append(img)
+	plt.imshow(img)
+	plt.show()
+'''
+#left_curve = cv2.imread('test_images/test2.jpg')
+#process_video(lines_array)
+process_video(clip1)
+
+#process_video(lines_array)
 
 #find_the_lines(color_and_gradient)
 #exit()
