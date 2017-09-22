@@ -12,6 +12,9 @@ image1 = mpimg.imread('test_images/straight_lines1.jpg')
 count = 0
 objpoints = [] # 3D points in real world space
 imgpoints = [] # 2D poitns in image plane
+fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
+#height, width, dimensions = result.shape
+out = cv2.VideoWriter('output.mp4', fourcc, 1, (1280, 720))
 
 def warp(img, original_image):
 
@@ -377,12 +380,11 @@ def measuring_curvature(original_image, warped, Minv):
 	#plt.show()
 	global count
 	count += 1
-	fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
-	height, width, dimensions = result.shape
+	
 	#print ("result shape" ,result.shape)
-	out = cv2.VideoWriter('output.mp4', fourcc, 1, (width, height))
+	#
 	out.write(result)
-	cv2.imwrite("video_images/result%d.jpg" %count, result)
+	#cv2.imwrite("video_images/result%d.jpg" %count, result)
 
 
 
@@ -464,6 +466,7 @@ plt.show()
 # work on detect lane lines
 
 # sat work on lane curvatue
+
 
 
 
