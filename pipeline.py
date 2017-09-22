@@ -7,14 +7,14 @@ import os
 
 
 clip1= cv2.VideoCapture('project_video.mp4')
-image1 = mpimg.imread('test_images/straight_lines1.jpg')
+image1 = mpimg.imread('video_images/original_image616.jpg')
 
 count = 0
 objpoints = [] # 3D points in real world space
 imgpoints = [] # 2D poitns in image plane
 fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
 #height, width, dimensions = result.shape
-out = cv2.VideoWriter('output.mp4', fourcc, 1, (1280, 720))
+out = cv2.VideoWriter('output.mp4', fourcc, 20, (1280, 720))
 
 def warp(img, original_image):
 
@@ -39,13 +39,15 @@ def warp(img, original_image):
 	Minv = cv2.getPerspectiveTransform(dst, src)
 
 	warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
-	#f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
-	'''ax1.set_title('original')
+	'''
+	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
+	ax1.set_title('original')
 	ax1.imshow(original_image)
 	ax2.set_title('Warped again')
 	ax2.imshow(warped)
 	plt.show()
 	'''
+	
 	find_the_lines(original_image, warped, Minv)
 
 def process_video(clip1):
@@ -116,13 +118,16 @@ def find_the_lines(original_image, binary_warped, Minv):
 	#print (binary_warped.shape)
 	# Assuming you have created a warped binary image called "binary_warped"
 	# Take a histogram of the bottom half of the image
+	global count
+	count += 1
+	#cv2.imwrite("video_images/original_image%d.jpg" %count, original_image)
 	histogram = np.sum(binary_warped[binary_warped.shape[0]//2:,:], axis=0)
-	'''
-	plt.plot(histogram)
-	plt.show()
-	plt.imshow(binary_warped)
-	plt.show()
-	'''
+	
+	#plt.plot(histogram)
+	#plt.show()
+	#plt.imshow(binary_warped)
+	#plt.show()
+	
 	# Crxeate an output image to draw on and  visualize the result
 	out_img = np.dstack((binary_warped, binary_warped, binary_warped))*255
 	# Find the peak of the left and right halves of the histogram
@@ -190,6 +195,23 @@ def find_the_lines(original_image, binary_warped, Minv):
 
 	# Fit a second order polynomial to each
 	left_fit = np.polyfit(lefty, leftx, 2)
+	
+	if not rightx.any(): 
+		#for i in leftx:
+		#	value = i + 600
+		#	np.append(rightx, value)
+			#print (rightx)
+		rightx = leftx
+	if not righty.any():
+		righty = lefty
+
+	#print ("righty length", righty.size)
+	#print ("lefty length", lefty.size)
+	#print ("rightx length", rightx.size)
+	#print ("leftx length", leftx.size)
+	
+
+
 	right_fit = np.polyfit(righty, rightx, 2)
 
 
@@ -357,8 +379,9 @@ def measuring_curvature(original_image, warped, Minv):
 	color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
 
 	# Recast the x and y points into usable format for cv2.fillPoly()
-	pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
-	pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
+	pts_left = np.array([np.transpose(np.vstack([left_fitx - 70, ploty]))])
+	# change right fix then bottom  right x is over, plot y then also wrong start up
+	pts_right = np.array([np.flipud(np.transpose(np.vstack([left_fitx  + 530, ploty])))])
 	pts = np.hstack((pts_left, pts_right))
 
 	# Draw the lane onto the warped blank image
@@ -368,18 +391,19 @@ def measuring_curvature(original_image, warped, Minv):
 	
 	#print ("image shape", img.shape[1])
 	newwarp = cv2.warpPerspective(color_warp, Minv, (1280, 720), flags=cv2.INTER_LINEAR) 
+	# flipping the image because it goes to the right instead of to the left
+	flipped_image = cv2.flip(newwarp,1)
 	#print ("new warp image shape", newwarp.shape)
 	#print ("new warp image shape", newwarp_resized.shape)
 	# Combine the result with the original image
 	#newwarp_resized = newwarp.shape[1::-1]
 	#print ("new warp resized", newwarp_resized)
-	result = cv2.addWeighted(original_image, 1, newwarp, 0.3, 0)
+	result = cv2.addWeighted(original_image, 1, flipped_image, 0.3, 0)
 	#plt.imshow(original_image)
 	#plt.imshow(newwarp)
 	#plt.imshow(result)
 	#plt.show()
-	global count
-	count += 1
+	
 	
 	#print ("result shape" ,result.shape)
 	#
@@ -403,6 +427,10 @@ for image in images:
 	image_array.append((img, image))
 print (image_array)
 
+
+# read in image 616 and see where the lines are
+
+
 camera_calibration(image_array)
 
 # Tues - color/gradient threshold
@@ -413,7 +441,7 @@ camera_calibration(image_array)
 #@def camera_calibration():
 
 '''
-
+'''
 lines_array = []
 lines_path = 'test_images/*.jpg'
 lines_images = glob.glob(lines_path)
@@ -423,7 +451,10 @@ for lines_image in lines_images:
 	lines_array.append(img)
 	#plt.imshow(img)
 	#plt.show()
+'''
 
+lines_array = []
+lines_array.append(image1)
 '''
 lines_array = []
 lines_path = 'test_images/straight_lines1.jpg'
@@ -437,9 +468,9 @@ for lines_image in lines_images:
 '''
 #left_curve = cv2.imread('test_images/test2.jpg')
 #process_video(lines_array)
-process_video(clip1)
 
-#process_video(lines_array)
+
+process_video(clip1)
 
 #find_the_lines(color_and_gradient)
 #exit()
@@ -470,3 +501,6 @@ plt.show()
 
 
 
+# if it can't detect the line then save the average of previous ones and use that
+
+# check if past some value flip if not dont
