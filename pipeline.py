@@ -193,11 +193,11 @@ def find_the_lines(original_image, binary_warped, Minv):
 	lefty = nonzeroy[left_lane_inds] 
 	rightx = nonzerox[right_lane_inds]
 	righty = nonzeroy[right_lane_inds] 
-	#print ("******last value of leftx", leftx[-1])
+	#print ("******last value of leftx", leftx[-1], "count", count)
 	if leftx[-1] > 390:
 		global how_curved
 		how_curved = True
-	print ("how curved 1", how_curved)	
+	#print ("how curved 1", how_curved)	
 
 	# Fit a second order polynomial to each
 	left_fit = np.polyfit(lefty, leftx, 2)
@@ -404,7 +404,7 @@ def measuring_curvature(original_image, warped, Minv):
 	# Combine the result with the original image
 	#newwarp_resized = newwarp.shape[1::-1]
 	#print ("new warp resized", newwarp_resized)
-	print ("how curved", how_curved)
+	#print ("how curved", how_curved)
 	if how_curved:
 		result = cv2.addWeighted(original_image, 1, new_warp, 0.3, 0)
 	else:
@@ -417,6 +417,7 @@ def measuring_curvature(original_image, warped, Minv):
 	
 	#print ("result shape" ,result.shape)
 	#
+	cv2.putText(result, 'Hello World', (200,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 	out.write(result)
 	#cv2.imwrite("video_images/result%d.jpg" %count, result)
 
