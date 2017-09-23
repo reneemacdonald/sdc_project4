@@ -10,6 +10,7 @@ clip1= cv2.VideoCapture('project_video.mp4')
 image1 = mpimg.imread('video_images/original_image616.jpg')
 
 count = 0
+how_curved = False
 objpoints = [] # 3D points in real world space
 imgpoints = [] # 2D poitns in image plane
 fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
@@ -192,6 +193,11 @@ def find_the_lines(original_image, binary_warped, Minv):
 	lefty = nonzeroy[left_lane_inds] 
 	rightx = nonzerox[right_lane_inds]
 	righty = nonzeroy[right_lane_inds] 
+	#print ("******last value of leftx", leftx[-1])
+	if leftx[-1] > 390:
+		global how_curved
+		how_curved = True
+	print ("how curved 1", how_curved)	
 
 	# Fit a second order polynomial to each
 	left_fit = np.polyfit(lefty, leftx, 2)
@@ -390,15 +396,19 @@ def measuring_curvature(original_image, warped, Minv):
 	# Warp the blank back to original image space using inverse perspective matrix (Minv)
 	
 	#print ("image shape", img.shape[1])
-	newwarp = cv2.warpPerspective(color_warp, Minv, (1280, 720), flags=cv2.INTER_LINEAR) 
+	new_warp = cv2.warpPerspective(color_warp, Minv, (1280, 720), flags=cv2.INTER_LINEAR) 
 	# flipping the image because it goes to the right instead of to the left
-	flipped_image = cv2.flip(newwarp,1)
+	flipped_image = cv2.flip(new_warp,1)
 	#print ("new warp image shape", newwarp.shape)
 	#print ("new warp image shape", newwarp_resized.shape)
 	# Combine the result with the original image
 	#newwarp_resized = newwarp.shape[1::-1]
 	#print ("new warp resized", newwarp_resized)
-	result = cv2.addWeighted(original_image, 1, flipped_image, 0.3, 0)
+	print ("how curved", how_curved)
+	if how_curved:
+		result = cv2.addWeighted(original_image, 1, new_warp, 0.3, 0)
+	else:
+		result = cv2.addWeighted(original_image, 1, flipped_image, 0.3, 0)
 	#plt.imshow(original_image)
 	#plt.imshow(newwarp)
 	#plt.imshow(result)
@@ -504,3 +514,4 @@ plt.show()
 # if it can't detect the line then save the average of previous ones and use that
 
 # check if past some value flip if not dont
+# also for stright lines
