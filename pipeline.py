@@ -13,9 +13,11 @@ count = 0
 how_curved = False
 objpoints = [] # 3D points in real world space
 imgpoints = [] # 2D poitns in image plane
+yvalue = 719
 fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
 #height, width, dimensions = result.shape
 out = cv2.VideoWriter('output.mp4', fourcc, 20, (1280, 720))
+offset_meters = 2.3
 
 def warp(img, original_image):
 
@@ -40,6 +42,10 @@ def warp(img, original_image):
 	Minv = cv2.getPerspectiveTransform(dst, src)
 
 	warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
+	global yvalue 
+	yvalue = img.shape[0]
+	##print ("image shape", img.shape[0])
+	#rint ("yvalue", yvalue)
 	'''
 	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
 	ax1.set_title('original')
@@ -121,6 +127,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 	# Take a histogram of the bottom half of the image
 	global count
 	count += 1
+	midpoint = original_image.shape[1]/2
 	#cv2.imwrite("video_images/original_image%d.jpg" %count, original_image)
 	histogram = np.sum(binary_warped[binary_warped.shape[0]//2:,:], axis=0)
 	
@@ -197,6 +204,20 @@ def find_the_lines(original_image, binary_warped, Minv):
 	if leftx[-1] > 390:
 		global how_curved
 		how_curved = True
+	firstx = leftx[0:1]
+	lastx = leftx[-1]
+	#print (firstx, lastx)
+	lane_center =  (firstx - lastx)/2
+	offset = midpoint - lane_center
+	x_m_per_pixel = 3.7/700
+	global offset_meters
+	offset_meters = x_m_per_pixel * offset
+
+
+
+	# midpoint in image is 640
+
+
 	#print ("how curved 1", how_curved)	
 
 	# Fit a second order polynomial to each
@@ -273,7 +294,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 	plt.xlim(0, 1280)
 	plt.ylim(720, 0)
 	'''
-	measuring_curvature(original_image, binary_warped, Minv)
+	measuring_curvature(original_image, binary_warped, Minv, offset_meters)
 
 def camera_calibration(images):
 	# Arrays to store object points and image points from all the images
@@ -324,7 +345,8 @@ def undistortion(objpoints, imgpoints, img, image_name):
 	#plt.show()
 	#ax2.set_title('Undistorted Image', fontsize=30)
 
-def measuring_curvature(original_image, warped, Minv):
+def measuring_curvature(original_image, warped, Minv, offset_meters):
+	#print (offset_meters)
 	# Generate some fake data to represent lane-line pixels
 	ploty = np.linspace(0, 719, num=720)# to cover same y-range as image
 	quadratic_coeff = 3e-4 # arbitrary quadratic coefficient
@@ -337,6 +359,14 @@ def measuring_curvature(original_image, warped, Minv):
 
 	leftx = leftx[::-1]  # Reverse to match top-to-bottom in y
 	rightx = rightx[::-1]  # Reverse to match top-to-bottom in y
+	
+	# real lane lines
+	'''
+	nonzero = warped.nonzero()
+	nonzerox = np.array(nonzero[1])
+	nonzeroy  = np.array(nonzero[0])
+	'''
+
 
 
 	# Fit a second order polynomial to pixel positions in each fake lane line
@@ -363,6 +393,7 @@ def measuring_curvature(original_image, warped, Minv):
 	y_eval = np.max(ploty)
 	left_curverad = ((1 + (2*left_fit[0]*y_eval + left_fit[1])**2)**1.5) / np.absolute(2*left_fit[0])
 	right_curverad = ((1 + (2*right_fit[0]*y_eval + right_fit[1])**2)**1.5) / np.absolute(2*right_fit[0])
+	curvature = (left_curverad + right_curverad )/2
 	#print("left curved", left_curverad, right_curverad)
 
 	# Define conversions in x and y from pixels space to meters
@@ -417,7 +448,10 @@ def measuring_curvature(original_image, warped, Minv):
 	
 	#print ("result shape" ,result.shape)
 	#
-	cv2.putText(result, 'Hello World', (200,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+
+	cv2.putText(result, 'Radius of curvature = %f'% curvature, (100,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+	cv2.putText(result, 'Vehicle is = %fm left of center'%offset_meters, (100,100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+	
 	out.write(result)
 	#cv2.imwrite("video_images/result%d.jpg" %count, result)
 
