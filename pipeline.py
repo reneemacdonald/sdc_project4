@@ -424,9 +424,9 @@ def measuring_curvature(original_image, warped, Minv, offset_meters):
 
 	# Draw the lane onto the warped blank image
 	# Draw the lane onto the warped blank image
-	#cv2.fillPoly(window_img, np.int_([left_line_pts]), (255,0, 0))
-	#cv2.fillPoly(window_img, np.int_([right_line_pts]), (0, 0, 255))
-	cv2.fillPoly(color_warp, np.int_([pts]), (255, 0, 0))
+	cv2.fillPoly(color_warp, np.int_([pts_left]), (255,0, 0))
+	cv2.fillPoly(color_warp, np.int_([pts_right]), (0, 0, 255))
+	cv2.fillPoly(color_warp, np.int_([pts]), (0, 255, 0))
 
 	# Warp the blank back to original image space using inverse perspective matrix (Minv)
 	
