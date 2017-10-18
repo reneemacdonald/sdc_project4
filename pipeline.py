@@ -21,7 +21,8 @@ offset_meters = 2.3
 
 def warp(img, original_image):
 
-	
+# to do don't hard code the numbers here 
+
 	img_size = (img.shape[1], img.shape[0])
 	
 	src = np.float32(
@@ -281,8 +282,8 @@ def find_the_lines(original_image, binary_warped, Minv):
 	right_line_pts = np.hstack((right_line_window1, right_line_window2))
 
 	# Draw the lane onto the warped blank image
-	cv2.fillPoly(window_img, np.int_([left_line_pts]), (0,255, 0))
-	cv2.fillPoly(window_img, np.int_([right_line_pts]), (0,255, 0))
+	cv2.fillPoly(window_img, np.int_([left_line_pts]), (255,0, 0))
+	cv2.fillPoly(window_img, np.int_([right_line_pts]), (0, 0, 255))
 
 	result = cv2.addWeighted(out_img, 1, window_img, 0.3, 0)
 	'''
@@ -422,7 +423,10 @@ def measuring_curvature(original_image, warped, Minv, offset_meters):
 	pts = np.hstack((pts_left, pts_right))
 
 	# Draw the lane onto the warped blank image
-	cv2.fillPoly(color_warp, np.int_([pts]), (0,255, 0))
+	# Draw the lane onto the warped blank image
+	#cv2.fillPoly(window_img, np.int_([left_line_pts]), (255,0, 0))
+	#cv2.fillPoly(window_img, np.int_([right_line_pts]), (0, 0, 255))
+	cv2.fillPoly(color_warp, np.int_([pts]), (255, 0, 0))
 
 	# Warp the blank back to original image space using inverse perspective matrix (Minv)
 	
