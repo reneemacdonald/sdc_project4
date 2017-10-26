@@ -17,7 +17,7 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [image1]: calibration2_undistorted.jpg "Undistorted"
-[image2]: warped.png "Warp Example"
+[image2]: warped_lines.png "Warp Example"
 [image3]: thresholded_binary_image.png "Thresholded Binary IMage"
 [video1]: ./project_video.mp4 "Video"
 
