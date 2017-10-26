@@ -33,7 +33,7 @@ The goals / steps of this project are the following:
 
 #### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
 
-The code for this step is contained in the first code cell of the IPython notebook located in "./examples/example.ipynb" (or in lines 300 through 325 of the file called `pipeline.py`).  
+The code for this step is in lines 327 through 340 of the file called `pipeline.py`).  
 
 I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
 
@@ -113,7 +113,7 @@ Here's a [link to my video result](https://youtu.be/ucCfw0YgV-Q)
 ### Discussion
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-I found that for the initial video because there weren't many changing in the lighting situation etc. It was fairly easy to just create an example lane line and use that and then just flip that when turning in a different direction. I didn't really need to do any complex calculation for the first video because the initial ones were pretty good. I also found that I could roughly calculate how far apart the lanes are and then just draw the other line parallel to the good line in cases where there weren't enough points for one of the lines. I also found that it overestimated the width of some of the lines so I adjusted to crop some of that out.
+I found that for the initial video because there weren't many changes in the lighting situation etc. It was fairly easy to just create an example lane line and use that and then just flip that when turning in a different direction. However, that didn't work so well for went it went straight as there was still a bit of the curved part hanging outside the lines. I didn't really need to do any complex calculation for the first video because the initial ones were pretty good. I also found that I could roughly calculate how far apart the lanes are and then just draw the other line parallel to the good line in cases where there weren't enough points for one of the lines. I also found that it overestimated the width of some of the lines so I adjusted to crop some of that out.
 
 If I had more time I would improve it by looking for the actual lines on each frame. I would have also broken up my code in different files. I might have played around more with the color and thresholding so that the lane lines would be longer. They were parallel but very short so in that case, if I coudln't find a line, then I just used the left one plus a certain amount or vice versa.
 
