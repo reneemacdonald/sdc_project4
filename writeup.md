@@ -20,6 +20,7 @@ The goals / steps of this project are the following:
 [image2]: warped_lines.png "Warp Example"
 [image3]: thresholded_binary_image.png "Thresholded Binary Image"
 [image4]: result242.jpg "Lane Area Image"
+[image5]: lane_line_pixels.png "Lane Line Pixels"
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
@@ -87,9 +88,7 @@ I verified that my perspective transform was working as expected by drawing the 
 
 ![alt text][image2]
 
-#### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
-
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+#### 4. In pipeline.py in lines 127 - 299 I identified lane-line pixels using a sliding window search
 
 ![alt text][image5]
 
