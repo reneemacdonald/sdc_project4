@@ -61,27 +61,28 @@ The code for my perspective transform includes a function called `warp()`, which
 
 ```python
 src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
+		[[210, 700],
+		[600, 450],
+		[700, 450],
+		[1100, 700]])
+
+	dst = np.float32(
+		[[350, 700],
+		[350, 0], 
+		[950, 0],
+		[950,  700]])
 ```
 
 This resulted in the following source and destination points:
 
 | Source        | Destination   | 
 |:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+| 210, 700      | 350, 700       | 
+| 600, 450      | 350, 0      |
+| 700, 450     | 950, 0      |
+| 1100, 700      | 950, 700        |
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image. If I had had more time I would have worked on a better way to calculate it rather than just putting numbers.
 
 ![alt text][image2]
 
@@ -93,7 +94,17 @@ Then I did some other stuff and fit my lane lines with a 2nd order polynomial ki
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+In lines 213-215 in pipeline.py I caclulated the offset from the center. In lines 396-398 I calculated the radius of curvature using this forumula R
+​curve
+​​ =
+​∣2A∣
+​
+​(1+(2Ay+B)
+​2
+​​ )
+​3/2
+​​ 
+​​
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
