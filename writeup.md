@@ -111,7 +111,7 @@ In lines 213-215 in pipeline.py I caclulated the offset from the center. In line
 
 I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
 
-![alt text][image6]
+![alt text][image4]
 
 ---
 
