@@ -109,7 +109,7 @@ In lines 213-215 in pipeline.py I caclulated the offset from the center. In line
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+I implemented this step in lines 350 through 460 in my code in `pipeline.py` in the function `measuring_curvature()`.  I found that my lane area was overflowing the left line a bit so n line 421,I cut off a number of pixels from the left area. On lines 206-208 I checked to see which way the lane was curving and flipped the polynomial if it was curving to the right. Here is an example of my result on a test image:
 
 ![alt text][image4]
 
