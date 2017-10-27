@@ -18,7 +18,8 @@ The goals / steps of this project are the following:
 
 [image1]: calibration2_undistorted.jpg "Undistorted"
 [image2]: warped_lines.png "Warp Example"
-[image3]: thresholded_binary_image.png "Thresholded Binary IMage"
+[image3]: thresholded_binary_image.png "Thresholded Binary Image"
+[image4]: original_image242.jpg "Lane Area Image"
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
