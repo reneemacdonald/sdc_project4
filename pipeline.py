@@ -56,6 +56,7 @@ def warp(img, original_image):
 	plt.show()
 	'''
 	
+	
 	find_the_lines(original_image, warped, Minv)
 
 def process_video(clip1):
@@ -95,15 +96,16 @@ def process_video(clip1):
 	#cv2.imshow('frame', scaled_sobel)
 
 	# Plotting thresholded images
-		
-		#f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
-		#ax1.set_title('Stacked thresholds')
-		#ax1.imshow(color_ binary)
+		'''
+		f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
+		ax1.set_title('Stacked thresholds')
+		plt.imshow(color_binary)
 
 
-		#ax2.set_title('Combined S channel and gradient thresholds')
-		#plt.imshow(combined_binary, cmap='gray')
-		#plt.show()
+		ax2.set_title('Combined S channel and gradient thresholds')
+		plt.imshow(combined_binary, cmap='gray')
+		plt.show()
+		'''
 		
 		warped=warp(combined_binary, frame)
 
@@ -394,8 +396,7 @@ def measuring_curvature(original_image, warped, Minv, offset_meters):
 	y_eval = np.max(ploty)
 	left_curverad = ((1 + (2*left_fit[0]*y_eval + left_fit[1])**2)**1.5) / np.absolute(2*left_fit[0])
 	right_curverad = ((1 + (2*right_fit[0]*y_eval + right_fit[1])**2)**1.5) / np.absolute(2*right_fit[0])
-	curvature = (left_curverad + right_curverad )/2
-	#print("left curved", left_curverad, right_curverad)
+	
 
 	# Define conversions in x and y from pixels space to meters
 	ym_per_pix = 30/720 # meters per pixel in y dimension
@@ -404,15 +405,17 @@ def measuring_curvature(original_image, warped, Minv, offset_meters):
 	# Fit new polynomials to x,y in world space
 	left_fit_cr = np.polyfit(ploty*ym_per_pix, leftx*xm_per_pix, 2)
 	right_fit_cr = np.polyfit(ploty*ym_per_pix, rightx*xm_per_pix, 2)
-	# Calculate the new radii of curvature
+	# Calculate the new radii of 
 	left_curverad = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])
 	right_curverad = ((1 + (2*right_fit_cr[0]*y_eval*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
+	curvature = (left_curverad + right_curverad )/2
+	#print("left curved", left_curverad, right_curverad)
 	# Now our radius of curvature is in meters
 	#print(left_curverad, 'm', right_curverad, 'm')
 	# Example values: 632.1 m    626.2 m
 
 	# Create an image to draw the lines on
-	#warp_zero = np.zeros_like(warped).astype(np.uint8)
+	#warp_zero = np.zeros_like(warped).astype(np.uint8)curvature
 	warp_zero = np.zeros_like(warped)
 	color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
 
@@ -537,20 +540,3 @@ plt.show()
 
 '''
 
-
-# To do work on teh warp image next - perspective transform thurs then fri work on lane lines
-
-
-# Fri chec that it's working on curved lines
-
-# work on detect lane lines
-
-# sat work on lane curvatue
-
-
-
-
-# if it can't detect the line then save the average of previous ones and use that
-
-# check if past some value flip if not dont
-# also for stright lines
