@@ -10,6 +10,7 @@ clip1= cv2.VideoCapture('project_video.mp4')
 image1 = mpimg.imread('video_images/original_image616.jpg')
 
 count = 0
+c = 0
 how_curved = False
 objpoints = [] # 3D points in real world space
 imgpoints = [] # 2D poitns in image plane
@@ -70,9 +71,18 @@ def process_video(clip1):
 
 	while (clip1.isOpened()):
 		ret, frame = clip1.read()
-		hls = cv2.cvtColor(frame, cv2.COLOR_BGR2HLS)
+		h, w = frame.shape[:2]
+		newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1,(w,h))
+		undistorted = cv2.undistort(frame, mtx, dist, None, newcameramtx)
+		global c
+		c += 1
+		#cv2.imwrite("undistorted/original%d.jpg" %c, frame)
+		#cv2.imwrite("undistorted/undistorted%d.jpg" %c, undistorted)
+		
+		hls = cv2.cvtColor(undistorted, cv2.COLOR_BGR2HLS)
+
 		s_channel = hls[:,:,2]
-		gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+		gray = cv2.cvtColor(undistorted, cv2.COLOR_BGR2GRAY)
 
 		sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0)
 		abs_sobelx = np.absolute(sobelx)
@@ -107,7 +117,7 @@ def process_video(clip1):
 		plt.show()
 		'''
 		
-		warped=warp(combined_binary, frame)
+		warped=warp(combined_binary, undistorted)
 
 		
 
@@ -321,7 +331,7 @@ def camera_calibration(images):
 			
 			#plt.imshow(img_corners)
 			#plt.show()
-			undistortion(objpoints, imgpoints, img_corners, image_name)
+			return undistortion(objpoints, imgpoints, img_corners, image_name)
 			i = i + 1
 		else:
 			print ("No corners found")
@@ -340,13 +350,15 @@ def undistortion(objpoints, imgpoints, img, image_name):
 
 	#os.rename(image_name, 'undistorted/' + name + '_undistorted' + ext)
 	cv2.imwrite('undistorted/'+name + '_undistorted' + ext, dst)
-
-	#f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
-	#ax1.imshow(img)
-	#ax1.set_title('Original Image', fontsize=30)
-	#plt.imshow(dst)
-	#plt.show()
-	#ax2.set_title('Undistorted Image', fontsize=30)
+	'''
+	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
+	ax1.imshow(img)
+	ax1.set_title('Original Image', fontsize=30)
+	plt.imshow(dst)
+	plt.show()
+	ax2.set_title('Undistorted Image', fontsize=30)
+	'''
+	return ret, mtx, dist, rvecs, tvecs
 
 def measuring_curvature(original_image, warped, Minv, offset_meters):
 	#print (offset_meters)
@@ -507,6 +519,20 @@ for lines_image in lines_images:
 
 lines_array = []
 lines_array.append(image1)
+
+image_array = []
+path ='camera_cal/*.jpg'
+images = glob.glob(path)
+for image in images:
+	img = cv2.imread(image)
+	#print ("image", image)
+	#plt.imshow(img)
+	#plt.show()
+	image_array.append((img, image))
+ret, mtx, dist, rvecs, tvecs = camera_calibration(image_array)
+
+
+#print (image_array)
 '''
 lines_array = []
 lines_path = 'test_images/straight_lines1.jpg'
@@ -537,6 +563,4 @@ plt.imshow(warped_im)
 plt.show()
 
 #warp(image1)
-
 '''
-
