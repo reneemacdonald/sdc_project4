@@ -21,6 +21,8 @@ The goals / steps of this project are the following:
 [image3]: thresholded_binary_image.png "Thresholded Binary Image"
 [image4]: result242.jpg "Lane Area Image"
 [image5]: lane_line_pixels.png "Lane Line Pixels"
+[image6]: undistorted1.jpg "Undistored Image"
+[image7]: distorted1.jpg "Distorted Image"
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
@@ -49,7 +51,9 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 #### 1. Provide an example of a distortion-corrected image.
 
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
-![alt text][image1]
+![alt text][image7]
+
+![alt text][image6]
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
@@ -118,7 +122,7 @@ I implemented this step in lines 350 through 460 in my code in `pipeline.py` in 
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](https://youtu.be/ucCfw0YgV-Q)
+Here's a [link to my video result](https://youtu.be/DU1saL0Wt3c)
 
 ---
 
