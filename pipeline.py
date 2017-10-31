@@ -295,20 +295,72 @@ def find_the_lines(original_image, binary_warped, Minv):
 	right_line_pts = np.hstack((right_line_window1, right_line_window2))
 
 	# Draw the lane onto the warped blank image
+	'''
+	# Shows the region of interests around which we can search
 	cv2.fillPoly(window_img, np.int_([left_line_pts]), (255,0, 0))
 	cv2.fillPoly(window_img, np.int_([right_line_pts]), (0, 0, 255))
 
 	result = cv2.addWeighted(out_img, 1, window_img, 0.3, 0)
+	cv2.imshow('result', result)
+	cv2.waitKey(0)
+	cv2.destroyAllWindows()
+	'''
+	
 	'''
 	plt.imshow(result)
 	plt.plot(left_fitx, ploty, color='yellow')
-	# right lane sometimes isn't correctly determined 
-	# if left lane has a pretty strong boundary, shift over to draw the right lane
-	plt.plot(left_fitx + 600, ploty, color='yellow')
+	plt.plot(right_fitx, ploty, color='yellow')
 	plt.xlim(0, 1280)
 	plt.ylim(720, 0)
 	'''
-	measuring_curvature(original_image, binary_warped, Minv, offset_meters)
+
+	# Create an image to draw the lines on
+	#warp_zero = np.zeros_like(warped).astype(np.uint8)curvature
+	warp_zero = np.zeros_like(binary_warped)
+	color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
+
+	# Recast the x and y points into usable format for cv2.fillPoly()
+	pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
+	# change right fix then bottom  right x is over, plot y then also wrong start up
+	pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
+	pts = np.hstack((pts_left, pts_right))
+
+	# Draw the lane onto the warped blank image
+	# Draw the lane onto the warped blank image
+	cv2.fillPoly(color_warp, np.int_([pts_left]), (255,0, 0))
+	cv2.fillPoly(color_warp, np.int_([pts_right]), (0, 0, 255))
+	cv2.fillPoly(color_warp, np.int_([pts]), (0, 255, 0))
+
+	# Warp the blank back to original image space using inverse perspective matrix (Minv)
+	
+	#print ("image shape", img.shape[1])
+	new_warp = cv2.warpPerspective(color_warp, Minv, (1280, 720), flags=cv2.INTER_LINEAR) 
+	# flipping the image because it goes to the right instead of to the left
+	#flipped_image = cv2.flip(new_warp,1)
+	#print ("new warp image shape", newwarp.shape)
+	#print ("new warp image shape", newwarp_resized.shape)
+	# Combine the result with the original image
+	#newwarp_resized = newwarp.shape[1::-1]
+	#print ("new warp resized", newwarp_resized)
+	#print ("how curved", how_curved)
+	#if how_curved:
+	result = cv2.addWeighted(original_image, 1, new_warp, 0.3, 0)
+	#else:
+	#	result = cv2.addWeighted(original_image, 1, flipped_image, 0.3, 0)
+	#plt.imshow(original_image)
+	#plt.imshow(newwarp)
+	#plt.imshow(result)
+	#plt.show()
+	
+	
+	#print ("result shape" ,result.shape)
+	#
+
+	#cv2.putText(result, 'Radius of curvature = %f'% curvature, (100,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+	cv2.putText(result, 'Vehicle is = %fm left of center'%offset_meters, (100,100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+	
+	out.write(result)
+	#measuring_curvature(original_image, binary_warped, Minv, offset_meters)
 
 def camera_calibration(images):
 	# Arrays to store object points and image points from all the images
@@ -427,52 +479,7 @@ def measuring_curvature(original_image, warped, Minv, offset_meters):
 	#print(left_curverad, 'm', right_curverad, 'm')
 	# Example values: 632.1 m    626.2 m
 
-	# Create an image to draw the lines on
-	#warp_zero = np.zeros_like(warped).astype(np.uint8)curvature
-	warp_zero = np.zeros_like(warped)
-	color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
-
-	# Recast the x and y points into usable format for cv2.fillPoly()
-	pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
-	# change right fix then bottom  right x is over, plot y then also wrong start up
-	pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
-	pts = np.hstack((pts_left, pts_right))
-
-	# Draw the lane onto the warped blank image
-	# Draw the lane onto the warped blank image
-	cv2.fillPoly(color_warp, np.int_([pts_left]), (255,0, 0))
-	cv2.fillPoly(color_warp, np.int_([pts_right]), (0, 0, 255))
-	cv2.fillPoly(color_warp, np.int_([pts]), (0, 255, 0))
-
-	# Warp the blank back to original image space using inverse perspective matrix (Minv)
 	
-	#print ("image shape", img.shape[1])
-	new_warp = cv2.warpPerspective(color_warp, Minv, (1280, 720), flags=cv2.INTER_LINEAR) 
-	# flipping the image because it goes to the right instead of to the left
-	#flipped_image = cv2.flip(new_warp,1)
-	#print ("new warp image shape", newwarp.shape)
-	#print ("new warp image shape", newwarp_resized.shape)
-	# Combine the result with the original image
-	#newwarp_resized = newwarp.shape[1::-1]
-	#print ("new warp resized", newwarp_resized)
-	#print ("how curved", how_curved)
-	#if how_curved:
-	result = cv2.addWeighted(original_image, 1, new_warp, 0.3, 0)
-	#else:
-	#	result = cv2.addWeighted(original_image, 1, flipped_image, 0.3, 0)
-	#plt.imshow(original_image)
-	#plt.imshow(newwarp)
-	#plt.imshow(result)
-	#plt.show()
-	
-	
-	#print ("result shape" ,result.shape)
-	#
-
-	cv2.putText(result, 'Radius of curvature = %f'% curvature, (100,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-	cv2.putText(result, 'Vehicle is = %fm left of center'%offset_meters, (100,100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-	
-	out.write(result)
 	#cv2.imwrite("video_images/result%d.jpg" %count, result)
 
 
@@ -565,3 +572,9 @@ plt.show()
 
 #warp(image1)
 '''
+
+
+# To do calculate radius and curvatue
+# Fix color gradients
+# Break into separate clases
+# Need to keep track of past things
