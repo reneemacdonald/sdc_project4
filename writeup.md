@@ -54,7 +54,7 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 ![alt text][image7]
 
 Original Image
-
+#####
 ![alt text][image6]
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
@@ -124,7 +124,7 @@ I implemented this step in lines 350 through 460 in my code in `pipeline.py` in 
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](https://youtu.be/DU1saL0Wt3c)
+Here's a [link to my video result](https://youtu.be/T4kexWADZYA)
 
 ---
 
