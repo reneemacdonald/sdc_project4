@@ -93,7 +93,7 @@ def process_video(clip1):
 		sxbinary = np.zeros_like(scaled_sobel)
 		sxbinary[(scaled_sobel >= thresh_min) & (scaled_sobel <= thresh_max)]
 
-		s_thresh_min = 170
+		s_thresh_min = 125
 		s_thresh_max = 255
 		s_binary = np.zeros_like(s_channel)
 		s_binary[(s_channel >= s_thresh_min) & (s_channel <= s_thresh_max)] = 1
@@ -214,9 +214,9 @@ def find_the_lines(original_image, binary_warped, Minv):
 	rightx = nonzerox[right_lane_inds]
 	righty = nonzeroy[right_lane_inds] 
 	#print ("******last value of leftx", leftx[-1], "count", count)
-	if leftx[-1] > 390:
-		global how_curved
-		how_curved = True
+	#if leftx[-1] > 390:
+	#	global how_curved
+	#	how_curved = True
 	firstx = leftx[0:1]
 	lastx = leftx[-1]
 	#print (firstx, lastx)
@@ -235,7 +235,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 
 	# Fit a second order polynomial to each
 	left_fit = np.polyfit(lefty, leftx, 2)
-	
+	'''
 	if not rightx.any(): 
 		#for i in leftx:
 		#	value = i + 600
@@ -244,6 +244,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 		rightx = leftx
 	if not righty.any():
 		righty = lefty
+	'''
 
 	#print ("righty length", righty.size)
 	#print ("lefty length", lefty.size)
@@ -268,7 +269,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 	'''
 	plt.imshow(out_img)
 	plt.plot(left_fitx, ploty, color='yellow')
-	plt.plot(left_fitx + 600, ploty, color='yellow')
+	plt.plot(right_fitx, ploty, color='yellow')
 	plt.xlim(0, 1280)
 	plt.ylim(720, 0)
 
@@ -432,9 +433,9 @@ def measuring_curvature(original_image, warped, Minv, offset_meters):
 	color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
 
 	# Recast the x and y points into usable format for cv2.fillPoly()
-	pts_left = np.array([np.transpose(np.vstack([left_fitx - 70, ploty]))])
+	pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
 	# change right fix then bottom  right x is over, plot y then also wrong start up
-	pts_right = np.array([np.flipud(np.transpose(np.vstack([left_fitx  + 530, ploty])))])
+	pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
 	pts = np.hstack((pts_left, pts_right))
 
 	# Draw the lane onto the warped blank image
@@ -448,17 +449,17 @@ def measuring_curvature(original_image, warped, Minv, offset_meters):
 	#print ("image shape", img.shape[1])
 	new_warp = cv2.warpPerspective(color_warp, Minv, (1280, 720), flags=cv2.INTER_LINEAR) 
 	# flipping the image because it goes to the right instead of to the left
-	flipped_image = cv2.flip(new_warp,1)
+	#flipped_image = cv2.flip(new_warp,1)
 	#print ("new warp image shape", newwarp.shape)
 	#print ("new warp image shape", newwarp_resized.shape)
 	# Combine the result with the original image
 	#newwarp_resized = newwarp.shape[1::-1]
 	#print ("new warp resized", newwarp_resized)
 	#print ("how curved", how_curved)
-	if how_curved:
-		result = cv2.addWeighted(original_image, 1, new_warp, 0.3, 0)
-	else:
-		result = cv2.addWeighted(original_image, 1, flipped_image, 0.3, 0)
+	#if how_curved:
+	result = cv2.addWeighted(original_image, 1, new_warp, 0.3, 0)
+	#else:
+	#	result = cv2.addWeighted(original_image, 1, flipped_image, 0.3, 0)
 	#plt.imshow(original_image)
 	#plt.imshow(newwarp)
 	#plt.imshow(result)
