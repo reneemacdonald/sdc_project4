@@ -81,7 +81,8 @@ def process_video(clip1):
 		
 		hls = cv2.cvtColor(undistorted, cv2.COLOR_BGR2HLS)
 
-		s_channel = hls[:,:,2]
+		#s_channel = hls[:,:,2]
+		l_channel = hls[:,:,1]
 		gray = cv2.cvtColor(undistorted, cv2.COLOR_BGR2GRAY)
 
 		sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0)
@@ -95,8 +96,8 @@ def process_video(clip1):
 
 		s_thresh_min = 125
 		s_thresh_max = 255
-		s_binary = np.zeros_like(s_channel)
-		s_binary[(s_channel >= s_thresh_min) & (s_channel <= s_thresh_max)] = 1
+		s_binary = np.zeros_like(l_channel)
+		s_binary[(l_channel >= s_thresh_min) & (l_channel <= s_thresh_max)] = 1
 
 		color_binary = np.dstack((np.zeros_like(sxbinary), sxbinary, s_binary))
 
@@ -141,7 +142,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 	global count
 	count += 1
 	midpoint = binary_warped.shape[1]/2
-	print("midpoint",midpoint)
+	#print("midpoint",midpoint)
 	#midpoint = original_image.shape[1]/2
 	#cv2.imwrite("video_images/original_image%d.jpg" %count, original_image)
 	histogram = np.sum(binary_warped[binary_warped.shape[0]//2:,:], axis=0)
@@ -224,13 +225,13 @@ def find_the_lines(original_image, binary_warped, Minv):
 	rightxlane = rightx[-1]
 	#print (firstx, rightxlane)
 	lane_width =  rightxlane - firstx
-	print ("lane width", lane_width)
+	#print ("lane width", lane_width)
 	offset = midpoint - lane_width
-	print (offset)
+	#print (offset)
 	x_m_per_pixel = 3.7/700
 	global offset_meters
 	offset_meters = x_m_per_pixel * offset
-	print ("offset_meters", offset_meters)
+	#print ("offset_meters", offset_meters)
 
 
 
