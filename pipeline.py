@@ -140,7 +140,9 @@ def find_the_lines(original_image, binary_warped, Minv):
 	# Take a histogram of the bottom half of the image
 	global count
 	count += 1
-	midpoint = original_image.shape[1]/2
+	midpoint = binary_warped.shape[1]/2
+	print("midpoint",midpoint)
+	#midpoint = original_image.shape[1]/2
 	#cv2.imwrite("video_images/original_image%d.jpg" %count, original_image)
 	histogram = np.sum(binary_warped[binary_warped.shape[0]//2:,:], axis=0)
 	
@@ -219,12 +221,16 @@ def find_the_lines(original_image, binary_warped, Minv):
 	#	how_curved = True
 	firstx = leftx[0:1]
 	lastx = leftx[-1]
-	#print (firstx, lastx)
-	lane_center =  (firstx - lastx)/2
-	offset = midpoint - lane_center
+	rightxlane = rightx[-1]
+	#print (firstx, rightxlane)
+	lane_width =  rightxlane - firstx
+	print ("lane width", lane_width)
+	offset = midpoint - lane_width
+	print (offset)
 	x_m_per_pixel = 3.7/700
 	global offset_meters
 	offset_meters = x_m_per_pixel * offset
+	print ("offset_meters", offset_meters)
 
 
 
