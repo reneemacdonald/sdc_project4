@@ -16,6 +16,7 @@ objpoints = [] # 3D points in real world space
 imgpoints = [] # 2D poitns in image plane
 yvalue = 719
 fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
+
 #height, width, dimensions = result.shape
 out = cv2.VideoWriter('output.mp4', fourcc, 20, (1280, 720))
 offset_meters = 2.3
@@ -71,6 +72,8 @@ def process_video(clip1):
 
 	while (clip1.isOpened()):
 		ret, frame = clip1.read()
+
+
 		h, w = frame.shape[:2]
 		newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1,(w,h))
 		undistorted = cv2.undistort(frame, mtx, dist, None, newcameramtx)
@@ -78,7 +81,9 @@ def process_video(clip1):
 		c += 1
 		#cv2.imwrite("undistorted/original%d.jpg" %c, frame)
 		#cv2.imwrite("undistorted/undistorted%d.jpg" %c, undistorted)
-		
+	
+
+
 		hls = cv2.cvtColor(undistorted, cv2.COLOR_BGR2HLS)
 
 		s_channel = hls[:,:,2]
@@ -94,20 +99,22 @@ def process_video(clip1):
 		sxbinary = np.zeros_like(scaled_sobel)
 		sxbinary[(scaled_sobel >= thresh_min) & (scaled_sobel <= thresh_max)]
 
-		l_thresh_min = 125
+		#150 pretty good results
+		# not 170 fails in the middle
+		l_thresh_min = 130
 		l_thresh_max = 255
 		l_binary = np.zeros_like(l_channel)
 		l_binary[(l_channel >= l_thresh_min) & (l_channel <= l_thresh_max)] = 1
 
-		s_thresh_min = 125
+		s_thresh_min = 90
 		s_thresh_max = 255
 		s_binary = np.zeros_like(s_channel)
-		s_binary[(l_channel >= s_thresh_min) & (s_channel <= s_thresh_max)] = 1
+		s_binary[(s_channel >= s_thresh_min) & (s_channel <= s_thresh_max)] = 1
 
 		color_binary = np.dstack((np.zeros_like(sxbinary), sxbinary, l_binary))
 
 		combined_binary = np.zeros_like(sxbinary)
-		combined_binary[(s_binary ==1) | (sxbinary == 1) | (s_binary == 1)] = 1
+		combined_binary[(l_binary ==1) | (sxbinary == 1)] = 1
 
 	#cv2.imshow('frame', scaled_sobel)
 
@@ -227,6 +234,8 @@ def find_the_lines(original_image, binary_warped, Minv):
 	#	how_curved = True
 	firstx = leftx[0:1]
 	lastx = leftx[-1]
+	
+
 	rightxlane = rightx[-1]
 	#print (firstx, rightxlane)
 	lane_width =  rightxlane - firstx
@@ -597,7 +606,8 @@ plt.show()
 '''
 
 
-# To do calculate radius and curvatue
+# To do:
+# apply a mask
 # Fix color gradients
 # Break into separate clases
-# Need to keep track of past things
+# Keep track of last ten frames
