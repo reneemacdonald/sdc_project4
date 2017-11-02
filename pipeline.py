@@ -81,7 +81,7 @@ def process_video(clip1):
 		
 		hls = cv2.cvtColor(undistorted, cv2.COLOR_BGR2HLS)
 
-		#s_channel = hls[:,:,2]
+		s_channel = hls[:,:,2]
 		l_channel = hls[:,:,1]
 		gray = cv2.cvtColor(undistorted, cv2.COLOR_BGR2GRAY)
 
@@ -94,15 +94,20 @@ def process_video(clip1):
 		sxbinary = np.zeros_like(scaled_sobel)
 		sxbinary[(scaled_sobel >= thresh_min) & (scaled_sobel <= thresh_max)]
 
+		l_thresh_min = 125
+		l_thresh_max = 255
+		l_binary = np.zeros_like(l_channel)
+		l_binary[(l_channel >= l_thresh_min) & (l_channel <= l_thresh_max)] = 1
+
 		s_thresh_min = 125
 		s_thresh_max = 255
-		s_binary = np.zeros_like(l_channel)
-		s_binary[(l_channel >= s_thresh_min) & (l_channel <= s_thresh_max)] = 1
+		s_binary = np.zeros_like(s_channel)
+		s_binary[(l_channel >= s_thresh_min) & (s_channel <= s_thresh_max)] = 1
 
-		color_binary = np.dstack((np.zeros_like(sxbinary), sxbinary, s_binary))
+		color_binary = np.dstack((np.zeros_like(sxbinary), sxbinary, l_binary))
 
 		combined_binary = np.zeros_like(sxbinary)
-		combined_binary[(s_binary ==1) | (sxbinary == 1)] = 1
+		combined_binary[(s_binary ==1) | (sxbinary == 1) | (s_binary == 1)] = 1
 
 	#cv2.imshow('frame', scaled_sobel)
 
@@ -237,32 +242,12 @@ def find_the_lines(original_image, binary_warped, Minv):
 
 	# midpoint in image is 640
 
-
 	#print ("how curved 1", how_curved)	
 
 	# Fit a second order polynomial to each
 	left_fit = np.polyfit(lefty, leftx, 2)
-	'''
-	if not rightx.any(): 
-		#for i in leftx:
-		#	value = i + 600
-		#	np.append(rightx, value)
-			#print (rightx)
-		rightx = leftx
-	if not righty.any():
-		righty = lefty
-	'''
-
-	#print ("righty length", righty.size)
-	#print ("lefty length", lefty.size)
-	#print ("rightx length", rightx.size)
-	#print ("leftx length", leftx.size)
-	
-
 
 	right_fit = np.polyfit(righty, rightx, 2)
-
-
 
 	# Generate x and y values for plotting
 	ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
@@ -358,12 +343,43 @@ def find_the_lines(original_image, binary_warped, Minv):
 	#plt.imshow(newwarp)
 	#plt.imshow(result)
 	#plt.show()
+
+	# Define y-value where we want radius of curvature
+	# I'll choose the maximum y-value, corresponding to the bottom of the image
+	y_eval = np.max(ploty)
+	left_curverad = ((1 + (2*left_fitx[0]*y_eval + left_fitx[1])**2)**1.5) / np.absolute(2*left_fitx[0])
+	right_curverad = ((1 + (2*right_fitx[0]*y_eval + right_fitx[1])**2)**1.5) / np.absolute(2*right_fitx[0])
+	#print(left_curverad, right_curverad)
 	
+	# Define conversions in x and y from pixels space to meters
+	ym_per_pix = 30/720 # meters per pixel in y dimension
+	xm_per_pix = 3.7/700 # meters per pixel in x dimension
+
+	# Define conversions in x and y from pixels space to meters
+	ym_per_pix = 30/720 # meters per pixel in y dimension
+	xm_per_pix = 3.7/700 # meters per pixel in x dimension
+
+	#print ("plot y", ploty.shape) #720
+	#print ("leftx", leftx.shape) #17228
+	#print ("Rightx", rightx.shape) #9975
+
+	# Fit new polynomials to x,y in world space
+	left_fit_cr = np.polyfit(ploty*ym_per_pix, left_fitx*xm_per_pix, 2)
+	right_fit_cr = np.polyfit(ploty*ym_per_pix, right_fitx*xm_per_pix, 2)
 	
 	#print ("result shape" ,result.shape)
-	#
 
-	#cv2.putText(result, 'Radius of curvature = %f'% curvature, (100,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+	#
+	
+
+	
+	# Calculate the new radii of 
+	left_curverad = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])
+	right_curverad = ((1 + (2*right_fit_cr[0]*y_eval*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
+	curvature = (left_curverad + right_curverad )/2
+	
+	curvature = (left_curverad + right_curverad )/2
+	cv2.putText(result, 'Radius of curvature = %f'% curvature, (100,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 	cv2.putText(result, 'Vehicle is = %fm left of center'%offset_meters, (100,100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 	
 	out.write(result)
