@@ -106,15 +106,16 @@ def process_video(clip1):
 		l_binary = np.zeros_like(l_channel)
 		l_binary[(l_channel >= l_thresh_min) & (l_channel <= l_thresh_max)] = 1
 
-		s_thresh_min = 90
+		s_thresh_min = 130
 		s_thresh_max = 255
 		s_binary = np.zeros_like(s_channel)
 		s_binary[(s_channel >= s_thresh_min) & (s_channel <= s_thresh_max)] = 1
 
-		color_binary = np.dstack((np.zeros_like(sxbinary), sxbinary, l_binary))
+		color_binary_s = np.dstack((np.zeros_like(sxbinary), sxbinary, s_binary))
+		color_binary_l = np.dstack((np.zeros_like(sxbinary), sxbinary, l_binary))
 
 		combined_binary = np.zeros_like(sxbinary)
-		combined_binary[(l_binary ==1) | (sxbinary == 1)] = 1
+		combined_binary[(l_binary ==1) | (s_binary == 1) | (sxbinary == 1) ] = 1
 
 	#cv2.imshow('frame', scaled_sobel)
 

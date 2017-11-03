@@ -124,14 +124,15 @@ I implemented this step in lines 350 through 460 in my code in `pipeline.py` in 
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](https://youtu.be/T4kexWADZYA)
+Here's a [link to my video result](https://youtu.be/ZwzrK2wDFqA)
 
 ---
 
 ### Discussion
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-I found that for the initial video because there weren't many changes in the lighting situation etc. It was fairly easy to just create an example lane line and use that and then just flip that when turning in a different direction. However, that didn't work so well for went it went straight as there was still a bit of the curved part hanging outside the lines. I didn't really need to do any complex calculation for the first video because the initial ones were pretty good. I also found that I could roughly calculate how far apart the lanes are and then just draw the other line parallel to the good line in cases where there weren't enough points for one of the lines. I also found that it overestimated the width of some of the lines so I adjusted to crop some of that out.
+I found that the s channel worked pretty well but failed in bright light. But the l channel was better but sometimes overestimated the lane line.
 
-If I had more time I would improve it by looking for the actual lines on each frame. I would have also broken up my code in different files. I might have played around more with the color and thresholding so that the lane lines would be longer. They were parallel but very short so in that case, if I coudln't find a line, then I just used the left one plus a certain amount or vice versa.
+If I had more time I would improve it by applying a mask first and only searching for the lines within that area. That would have eliminated some of the problem with the l channel 
+vastly overestimating the lines in some areas where it mistook a shadow for the line. Also I would like to break up my one class into several classes and also keep track of the previous ten frames so that if it couldn't find the lines it could use an average of the last ten ones.
 
