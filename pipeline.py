@@ -124,8 +124,6 @@ def process_video(clip1):
 		f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
 		ax1.set_title('Stacked thresholds')
 		plt.imshow(color_binary)
-
-
 		ax2.set_title('Combined S channel and gradient thresholds')
 		plt.imshow(combined_binary, cmap='gray')
 		plt.show()
@@ -274,7 +272,6 @@ def find_the_lines(original_image, binary_warped, Minv):
 	plt.plot(right_fitx, ploty, color='yellow')
 	plt.xlim(0, 1280)
 	plt.ylim(720, 0)
-
 	plt.show()
 	'''
 
@@ -301,7 +298,6 @@ def find_the_lines(original_image, binary_warped, Minv):
 	# Shows the region of interests around which we can search
 	cv2.fillPoly(window_img, np.int_([left_line_pts]), (255,0, 0))
 	cv2.fillPoly(window_img, np.int_([right_line_pts]), (0, 0, 255))
-
 	result = cv2.addWeighted(out_img, 1, window_img, 0.3, 0)
 	cv2.imshow('result', result)
 	cv2.waitKey(0)
@@ -403,8 +399,10 @@ def camera_calibration(images):
 	#print ("image ", image_name)
 	objp = np.zeros((6*9,3), np.float32)
 	objp[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2) # x, y coordinates
-	i = 0
+
 	for img, image_name in images:
+		i = 0
+		
 		gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 		ret, corners = cv2.findChessboardCorners(gray, (9,6), None)
@@ -412,16 +410,20 @@ def camera_calibration(images):
 		if ret == True:
 			imgpoints.append(corners)
 			objpoints.append(objp)
-			
 			img_corners = cv2.drawChessboardCorners(img, (9,6), corners, ret)
+			img_size = (img_corners.shape[1], img_corners.shape[0])
 			
-			#plt.imshow(img_corners)
-			#plt.show()
-			return undistortion(objpoints, imgpoints, img_corners, image_name)
-			i = i + 1
+			
+			#i = i + 1
 		else:
 			print ("No corners found")
-
+		
+			
+		#plt.imshow(img_corners)
+		#plt.show()
+	ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, img_size, None, None)
+	return mtx, dist
+'''
 def undistortion(objpoints, imgpoints, img, image_name):
 	img_size = (img.shape[1], img.shape[0])
 
@@ -436,15 +438,16 @@ def undistortion(objpoints, imgpoints, img, image_name):
 
 	#os.rename(image_name, 'undistorted/' + name + '_undistorted' + ext)
 	cv2.imwrite('undistorted/'+name + '_undistorted' + ext, dst)
-	'''
+	
 	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
 	ax1.imshow(img)
 	ax1.set_title('Original Image', fontsize=30)
 	plt.imshow(dst)
 	plt.show()
 	ax2.set_title('Undistorted Image', fontsize=30)
-	'''
+	
 	return ret, mtx, dist, rvecs, tvecs
+	'''
 
 def measuring_curvature(original_image, warped, Minv, offset_meters):
 	#print (offset_meters)
@@ -531,20 +534,11 @@ for image in images:
 	#plt.show()
 	image_array.append((img, image))
 print (image_array)
-
-
 # read in image 616 and see where the lines are
-
-
 camera_calibration(image_array)
-
 # Tues - color/gradient threshold
-
-
 #undistortion(objpoints, imgpoints, image)
-
 #@def camera_calibration():
-
 '''
 '''
 lines_array = []
@@ -570,7 +564,7 @@ for image in images:
 	#plt.imshow(img)
 	#plt.show()
 	image_array.append((img, image))
-ret, mtx, dist, rvecs, tvecs = camera_calibration(image_array)
+mtx, dist = camera_calibration(image_array)
 
 
 #print (image_array)
@@ -598,11 +592,9 @@ warped_im = warp(image1)
 f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
 ax1.set_title('Source Image')
 ax1.imshow(image1)
-
 ax2.set_title('Warped Image')
 plt.imshow(warped_im)
 plt.show()
-
 #warp(image1)
 '''
 
