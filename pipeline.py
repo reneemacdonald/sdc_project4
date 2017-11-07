@@ -116,6 +116,7 @@ def process_video(clip1):
 
 		combined_binary = np.zeros_like(sxbinary)
 		combined_binary[(l_binary ==1) | (s_binary == 1) | (sxbinary == 1) ] = 1
+		
 
 	#cv2.imshow('frame', scaled_sobel)
 
@@ -234,16 +235,18 @@ def find_the_lines(original_image, binary_warped, Minv):
 	firstx = leftx[0:1]
 	lastx = leftx[-1]
 	
-
+	#print ("binary warped shape", binary_warped.shape[1])
+	camera_position =  (binary_warped.shape[1])/2
+	#print ("image_width", image_width)
 	rightxlane = rightx[-1]
 	#print (firstx, rightxlane)
-	lane_width =  rightxlane - firstx
+	lane_center =  (rightxlane + firstx)/2
 	#print ("lane width", lane_width)
-	offset = midpoint - lane_width
-	#print (offset)
+	offset_pixels = abs(camera_position - lane_center)
+	#print ("offset", offset)
 	x_m_per_pixel = 3.7/700
 	global offset_meters
-	offset_meters = x_m_per_pixel * offset
+	offset_meters = x_m_per_pixel * offset_pixels
 	#print ("offset_meters", offset_meters)
 
 
@@ -600,7 +603,10 @@ plt.show()
 
 
 # To do:
-# apply a mask
+# apply a mask, only search within a certain area
 # Fix color gradients
 # Break into separate clases
 # Keep track of last ten frames
+
+
+# get the offset from the center
