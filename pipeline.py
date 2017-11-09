@@ -21,6 +21,8 @@ fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
 out = cv2.VideoWriter('output.mp4', fourcc, 20, (1280, 720))
 offset_meters = 2.3
 
+previous_warp = mpimg.imread('video_images/original_image616.jpg')
+
 def warp(img, original_image):
 
 # to do don't hard code the numbers here 
@@ -233,6 +235,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 	#	global how_curved
 	#	how_curved = True
 	firstx = leftx[0:1]
+	#print ("firstx ", firstx)
 	lastx = leftx[-1]
 	
 	#print ("binary warped shape", binary_warped.shape[1])
@@ -345,7 +348,12 @@ def find_the_lines(original_image, binary_warped, Minv):
 	#print ("new warp resized", newwarp_resized)
 	#print ("how curved", how_curved)
 	#if how_curved:
-	result = cv2.addWeighted(original_image, 1, new_warp, 0.3, 0)
+	global previous_warp
+	if firstx < 200:
+		result = cv2.addWeighted(original_image, 1, previous_warp, 0.3, 0)
+	else:
+		result = cv2.addWeighted(original_image, 1, new_warp, 0.3, 0)
+	previous_warp = result
 	#else:
 	#	result = cv2.addWeighted(original_image, 1, flipped_image, 0.3, 0)
 	#plt.imshow(original_image)
@@ -388,10 +396,13 @@ def find_the_lines(original_image, binary_warped, Minv):
 	curvature = (left_curverad + right_curverad )/2
 	
 	curvature = (left_curverad + right_curverad )/2
+
+	
 	cv2.putText(result, 'Radius of curvature = %f'% curvature, (100,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 	cv2.putText(result, 'Vehicle is = %fm left of center'%offset_meters, (100,100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-	
+	cv2.putText(result, "first x is %f"% firstx, (100,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
 	out.write(result)
+		
 	#measuring_curvature(original_image, binary_warped, Minv, offset_meters)
 
 def camera_calibration(images):
@@ -429,16 +440,11 @@ def camera_calibration(images):
 '''
 def undistortion(objpoints, imgpoints, img, image_name):
 	img_size = (img.shape[1], img.shape[0])
-
 	ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, img_size, None, None)
-
 	dst = cv2.undistort(img, mtx, dist, None, mtx)
-
-
 	name, ext = os.path.splitext(image_name)
 	#print ("name ", name)
 	#print ("ext ", ext)
-
 	#os.rename(image_name, 'undistorted/' + name + '_undistorted' + ext)
 	cv2.imwrite('undistorted/'+name + '_undistorted' + ext, dst)
 	
