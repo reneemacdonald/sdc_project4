@@ -348,12 +348,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 	#print ("new warp resized", newwarp_resized)
 	#print ("how curved", how_curved)
 	#if how_curved:
-	global previous_warp
-	if firstx < 200:
-		result = cv2.addWeighted(original_image, 1, previous_warp, 0.3, 0)
-	else:
-		result = cv2.addWeighted(original_image, 1, new_warp, 0.3, 0)
-	previous_warp = result
+	
 	#else:
 	#	result = cv2.addWeighted(original_image, 1, flipped_image, 0.3, 0)
 	#plt.imshow(original_image)
@@ -397,10 +392,15 @@ def find_the_lines(original_image, binary_warped, Minv):
 	
 	curvature = (left_curverad + right_curverad )/2
 
+	global previous_warp
+	if firstx < 260 or curvature < 500:
+		result = cv2.addWeighted(original_image, 1, previous_warp, 0.3, 0)
+	else:
+		result = cv2.addWeighted(original_image, 1, new_warp, 0.3, 0)
+		previous_warp = new_warp
 	
 	cv2.putText(result, 'Radius of curvature = %f'% curvature, (100,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 	cv2.putText(result, 'Vehicle is = %fm left of center'%offset_meters, (100,100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-	cv2.putText(result, "first x is %f"% firstx, (100,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
 	out.write(result)
 		
 	#measuring_curvature(original_image, binary_warped, Minv, offset_meters)
