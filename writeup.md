@@ -38,7 +38,7 @@ The goals / steps of this project are the following:
 
 #### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
 
-The code for this step is in lines 327 through 340 of the file called `pipeline.py`.  
+The code for this step is in lines 408 through 439 of the file called `pipeline.py`.  
 
 I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
 
@@ -59,13 +59,13 @@ Original Image
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines 61 through 102 in `pipeline.py`).  Here's an example of my output for this step. 
+I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines 89 through 120 in `pipeline.py`).  Here's an example of my output for this step. 
 
 ![alt text][image3]
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warp()`, which appears in lines 22 through 59 in the file `pipeline.py` (pipeline.py) The `warp()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `warp()`, which appears in lines 26 through 64 in the file `pipeline.py` (pipeline.py) The `warp()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
 
 ```python
 src = np.float32(
@@ -100,7 +100,7 @@ I verified that my perspective transform was working as expected by drawing the 
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-In lines 213-215 in pipeline.py I caclulated the offset from the center. In lines 396-398 I calculated the radius of curvature using this forumula R
+In lines 248-252 in pipeline.py I caclulated the offset from the center. In lines 389-393 I calculated the radius of curvature using this forumula R
 ​curve
 ​​ =
 ​∣2A∣
@@ -114,7 +114,7 @@ In lines 213-215 in pipeline.py I caclulated the offset from the center. In line
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines 350 through 460 in my code in `pipeline.py` in the function `measuring_curvature()`.  I found that my lane area was overflowing the left line a bit so n line 421,I cut off a number of pixels from the left area. On lines 206-208 I checked to see which way the lane was curving and flipped the polynomial if it was curving to the right. Here is an example of my result on a test image:
+I implemented this step in lines 461 through 521 in my code in `pipeline.py` in the function `measuring_curvature()`. Here is an example of my result on a test image:
 
 ![alt text][image4]
 
