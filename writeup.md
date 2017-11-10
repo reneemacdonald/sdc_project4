@@ -50,7 +50,9 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 
 #### 1. Provide an example of a distortion-corrected image.
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
+I used a chessboard to calculate the distortion because it is very easy to see what a chessboard normally looks like vs how it looks like in the images. And it's easy to 
+detect automatically because of its pattern. Therefore
+making it easy to map distorted points to undistorted points. I then used the values I got to undistort my images before searching for the lane lines:
 ![alt text][image7]
 
 Original Image
