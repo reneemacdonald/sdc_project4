@@ -65,7 +65,7 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warp()`, which appears in lines 26 through 64 in the file `pipeline.py` (pipeline.py) The `warp()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `warp()`, which appears in lines 26 through 64 in the file `pipeline.py` (pipeline.py) The `warp()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I hardcoded the source and destination points in the following manner:
 
 ```python
 src = np.float32(
@@ -81,6 +81,8 @@ src = np.float32(
 		[950,  700]])
 ```
 
+A better way would have been to dynamically generate the points, because these points would only work on similar roads. For instance on roads that are much narrower these points would fail. 
+
 This resulted in the following source and destination points:
 
 | Source        | Destination   | 
@@ -94,7 +96,8 @@ I verified that my perspective transform was working as expected by drawing the 
 
 ![alt text][image2]
 
-#### 4. In pipeline.py in lines 127 - 299 I identified lane-line pixels using a sliding window search
+#### 4. In pipeline.py in lines 127 - 299 I identified lane-line pixels using a sliding window search. First I plotted a histogram of the pixel values along each column in teh image. 
+In the histogram I used the two most prominent peaks as a good indication of the x position of the base of the lane lines. I began searching for the lane lines there. I divided the image into 9 areas to search for the lines. But this method failed when there were a lot of shadows and the pixels values for the shadow were very high. In that case, it drew the line almost to the edge of barrier. To correct for that issue if I had more time I would just search around the area where the lane lines were previously found and that would have acted as a kind of mask. But instead I did a validation to check whether whether where it found the first x pixel was realistic or not. I noticed most times it was around 400 but in some cases it was 50 or 250 or even 0. So in my validation I used the previous frame where the firstx was less than 250. However, that isn't such a good approach because with other images it's possible that the average for where the firstx is might have been lower such as 200 then excluding anything under 250 would have meant there wasn't a first good frame or else most of the lane areas would have been the same. I could have skipped the sliding windows search if I had previously found a fit. But when I tried doing that, that part wasn't working for me so I just went back to finding it every time. But if you search every time then it is slower and also it means you need to do a validation if the first x values is very far off. If I had just searching around the general area where the lines would found before then I might not have needed to do a validation for the first x. I also tried searching with 4 lane windows and that performed almost as well as dividing the frame into 9 windows. But I believe 9 windows is probably better because it's more general. In our case, the lines were either straight or only slightly curved there were no sharp curves. I believe that if there were sharp curves then 4 windows wouldn't be enough. 
 
 ![alt text][image5]
 
@@ -134,4 +137,4 @@ Here's a [link to my video result](https://youtu.be/Fby-P1Zlwqo)
 
 My pipeline would probably fail in poor weather conditions such as if there were snow or rain which would hamper visibility. It might also fail at night as all the situations I've tested it on are during the day. 
 
-If I had more time I would improve it by keeping track of the past ten good frames and then if the lines couldn't be detetected or failed the validation criteria, it would use an average of those past ten frames. Currently when it fails validation, I take the previous frame. Also I would like to break up my one file into several clases and not use global variables. 
+If I had more time I would improve it by keeping track of the past ten good frames and then if the lines couldn't be detetected or failed the validation criteria, it would use an average of those past ten frames. Currently when it fails validation, I take the previous frame. Also I would like to break up my one file into several clases and not use global variables. Also I noticed in some frames the radius of curvature is very large, although the lane lines appear to be correctly found. I believe I should have used a different formulas for straight lines as the curvature there should have been 0. So I might have checked to see if the curvature was an extremely large number and if so replaced it with zero instead. 
