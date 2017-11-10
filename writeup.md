@@ -59,7 +59,7 @@ Original Image
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines 61 through 102 in `another_file.py`).  Here's an example of my output for this step. 
+I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines 61 through 102 in `pipeline.py`).  Here's an example of my output for this step. 
 
 ![alt text][image3]
 
@@ -131,8 +131,7 @@ Here's a [link to my video result](https://youtu.be/Fby-P1Zlwqo)
 ### Discussion
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-I found that the s channel worked pretty well but failed in bright light. But the l channel was better but sometimes overestimated the lane line.
 
-If I had more time I would improve it by applying a mask first and only searching for the lines within that area. That would have eliminated some of the problem with the l channel 
-vastly overestimating the lines in some areas where it mistook a shadow for the line. Also I would like to break up my one class into several classes and also keep track of the previous ten frames so that if it couldn't find the lines it could use an average of the last ten ones.
+My pipeline would probably fail in poor weather conditions such as if there were snow or rain which would hamper visibility. It might also fail at night as all the situations I've tested it on are during the day. 
 
+If I had more time I would improve it by keeping track of the past ten good frames and then if the lines couldn't be detetected or failed the validation criteria, it would use an average of those past ten frames. Currently when it fails validation, I take the previous frame. Also I would like to break up my one file into several clases and not use global variables. 
