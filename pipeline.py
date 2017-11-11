@@ -7,7 +7,7 @@ import os
 
 
 clip1= cv2.VideoCapture('project_video.mp4')
-image1 = mpimg.imread('video_images/original_image616.jpg')
+#image1 = mpimg.imread('video_images/original_image616.jpg')
 
 count = 0
 c = 0
