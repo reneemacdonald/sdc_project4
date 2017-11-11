@@ -561,8 +561,8 @@ for lines_image in lines_images:
 	#plt.show()
 '''
 
-lines_array = []
-lines_array.append(image1)
+#lines_array = []
+#lines_array.append(image1)
 
 image_array = []
 path ='camera_cal/*.jpg'
