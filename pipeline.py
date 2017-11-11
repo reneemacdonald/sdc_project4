@@ -21,7 +21,7 @@ fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
 out = cv2.VideoWriter('output.mp4', fourcc, 20, (1280, 720))
 offset_meters = 2.3
 
-previous_warp = mpimg.imread('video_images/original_image616.jpg')
+previous_warp = mpimg.imread('original_image616.jpg')
 
 def warp(img, original_image):
 
