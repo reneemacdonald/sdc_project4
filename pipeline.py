@@ -415,23 +415,22 @@ def camera_calibration(images):
 	objp[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2) # x, y coordinates
 
 	for img, image_name in images:
+		img_size = (img.shape[1], img.shape[0])
 		i = 0
 		
 		gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 		ret, corners = cv2.findChessboardCorners(gray, (9,6), None)
-		img_size = (img_corners.shape[1], img_corners.shape[0])
+
 		if ret == True:
 			imgpoints.append(corners)
 			objpoints.append(objp)
 			img_corners = cv2.drawChessboardCorners(img, (9,6), corners, ret)
 			
-			
-			
 			#i = i + 1
 		else:
 			print ("No corners found")
-			
+
 
 		
 			
