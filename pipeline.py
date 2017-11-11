@@ -436,7 +436,7 @@ def camera_calibration(images):
 			
 		#plt.imshow(img_corners)
 		#plt.show()
-	ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, img_size, None, None)
+	ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, (1280, 720), None, None)
 	return mtx, dist
 '''
 def undistortion(objpoints, imgpoints, img, image_name):
