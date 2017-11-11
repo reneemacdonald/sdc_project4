@@ -420,17 +420,19 @@ def camera_calibration(images):
 		gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 		ret, corners = cv2.findChessboardCorners(gray, (9,6), None)
-
+		img_size = (img_corners.shape[1], img_corners.shape[0])
 		if ret == True:
 			imgpoints.append(corners)
 			objpoints.append(objp)
 			img_corners = cv2.drawChessboardCorners(img, (9,6), corners, ret)
-			img_size = (img_corners.shape[1], img_corners.shape[0])
+			
 			
 			
 			#i = i + 1
 		else:
 			print ("No corners found")
+			
+
 		
 			
 		#plt.imshow(img_corners)
