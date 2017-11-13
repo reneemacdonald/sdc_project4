@@ -7,7 +7,7 @@ import os
 
 
 clip1= cv2.VideoCapture('project_video.mp4')
-#image1 = mpimg.imread('video_images/original_image616.jpg')
+image1 = cv2.imread('video_images/original_image559.jpg')
 
 count = 0
 c = 0
@@ -75,7 +75,7 @@ def process_video(clip1):
 	while (clip1.isOpened()):
 		ret, frame = clip1.read()
 
-
+		#h, w = image.shape[:2]
 		h, w = frame.shape[:2]
 		newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1,(w,h))
 		undistorted = cv2.undistort(frame, mtx, dist, None, newcameramtx)
@@ -86,10 +86,19 @@ def process_video(clip1):
 	
 
 
-		hls = cv2.cvtColor(undistorted, cv2.COLOR_BGR2HLS)
+		luv = cv2.cvtColor(undistorted, cv2.COLOR_BGR2LUV)
 
-		s_channel = hls[:,:,2]
-		l_channel = hls[:,:,1]
+		hsv = cv2.cvtColor(undistorted, cv2.COLOR_BGR2HSV)
+
+		rgb = cv2.cvtColor(undistorted, cv2.COLOR_BGR2RGB)
+
+		s_channel = hsv[:,:,1]
+		l_channel = luv[:,:,0]
+
+		r_channel = rgb[:,:,0]
+
+		v_channel = hsv[:,:,2]
+
 		gray = cv2.cvtColor(undistorted, cv2.COLOR_BGR2GRAY)
 
 		sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0)
@@ -103,21 +112,31 @@ def process_video(clip1):
 
 		#150 pretty good results
 		# not 170 fails in the middle
-		l_thresh_min = 130
+		l_thresh_min = 150
 		l_thresh_max = 255
 		l_binary = np.zeros_like(l_channel)
 		l_binary[(l_channel >= l_thresh_min) & (l_channel <= l_thresh_max)] = 1
 
-		s_thresh_min = 130
+		r_thresh_min = 225
+		r_thresh_max = 255
+		r_binary = np.zeros_like(r_channel)
+		r_binary[(r_channel >= r_thresh_min) & (r_channel <= r_thresh_max)] = 1
+
+		s_thresh_min = 90
 		s_thresh_max = 255
 		s_binary = np.zeros_like(s_channel)
 		s_binary[(s_channel >= s_thresh_min) & (s_channel <= s_thresh_max)] = 1
+
+		v_thresh_min = 150
+		v_thresh_max = 255
+		v_binary = np.zeros_like(v_channel)
+		v_binary[(v_channel >= v_thresh_min) & (v_channel <= v_thresh_max)] = 1
 
 		color_binary_s = np.dstack((np.zeros_like(sxbinary), sxbinary, s_binary))
 		color_binary_l = np.dstack((np.zeros_like(sxbinary), sxbinary, l_binary))
 
 		combined_binary = np.zeros_like(sxbinary)
-		combined_binary[(l_binary ==1) | (s_binary == 1) | (sxbinary == 1) ] = 1
+		combined_binary[(l_binary ==1) & (s_binary == 1)  | (r_binary == 1) ] = 1
 		
 
 	#cv2.imshow('frame', scaled_sobel)
@@ -125,8 +144,8 @@ def process_video(clip1):
 	# Plotting thresholded images
 		'''
 		f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
-		ax1.set_title('Stacked thresholds')
-		plt.imshow(color_binary)
+		#ax1.set_title('Stacked thresholds')
+		#plt.imshow(color_binary)
 		ax2.set_title('Combined S channel and gradient thresholds')
 		plt.imshow(combined_binary, cmap='gray')
 		plt.show()
@@ -300,17 +319,16 @@ def find_the_lines(original_image, binary_warped, Minv):
 	right_line_pts = np.hstack((right_line_window1, right_line_window2))
 
 	# Draw the lane onto the warped blank image
-	'''
+	
 	# Shows the region of interests around which we can search
+	'''
 	cv2.fillPoly(window_img, np.int_([left_line_pts]), (255,0, 0))
 	cv2.fillPoly(window_img, np.int_([right_line_pts]), (0, 0, 255))
 	result = cv2.addWeighted(out_img, 1, window_img, 0.3, 0)
-	cv2.imshow('result', result)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-	'''
+	plt.imshow(result)
+	plt.show()
 	
-	'''
+	
 	plt.imshow(result)
 	plt.plot(left_fitx, ploty, color='yellow')
 	plt.plot(right_fitx, ploty, color='yellow')
@@ -392,6 +410,12 @@ def find_the_lines(original_image, binary_warped, Minv):
 	
 	curvature = (left_curverad + right_curverad )/2
 
+	# for single image debugging
+
+	#result = cv2.addWeighted(original_image, 1, new_warp, 0.3, 0)
+
+	# for video images
+	
 	global previous_warp
 	if firstx < 260 or curvature < 500:
 		result = cv2.addWeighted(original_image, 1, previous_warp, 0.3, 0)
@@ -562,8 +586,8 @@ for lines_image in lines_images:
 	#plt.show()
 '''
 
-#lines_array = []
-#lines_array.append(image1)
+lines_array = []
+lines_array.append(image1)
 
 image_array = []
 path ='camera_cal/*.jpg'
