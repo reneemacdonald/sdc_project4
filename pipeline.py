@@ -254,7 +254,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 	#	global how_curved
 	#	how_curved = True
 	firstx = leftx[0:1]
-	#print ("firstx ", firstx)
+	
 	lastx = leftx[-1]
 	
 	#print ("binary warped shape", binary_warped.shape[1])
@@ -262,11 +262,17 @@ def find_the_lines(original_image, binary_warped, Minv):
 	#print ("image_width", image_width)
 	rightxlane = rightx[-1]
 	#print (firstx, rightxlane)
-	lane_center =  (rightxlane + firstx)/2
+	left_start = leftx[719] if len(leftx ) > 718 else 0
+	right_start = rightx[719] if len(rightx) > 718 else 0
+	if left_start == 0 or right_start == 0:
+		lane_center = 0
+	else:
+		lane_center =  (left_start + right_start)/2
+	
 	#print ("lane width", lane_width)
 	offset_pixels = abs(camera_position - lane_center)
 	#print ("offset", offset)
-	x_m_per_pixel = 3.7/700
+	x_m_per_pixel = 3.7/600
 	global offset_meters
 	offset_meters = x_m_per_pixel * offset_pixels
 	#print ("offset_meters", offset_meters)
@@ -286,6 +292,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 	ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
 	left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
 	right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
+
 
 	out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
 	out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
@@ -318,6 +325,7 @@ def find_the_lines(original_image, binary_warped, Minv):
 	                              ploty])))])
 	right_line_pts = np.hstack((right_line_window1, right_line_window2))
 
+	
 	# Draw the lane onto the warped blank image
 	
 	# Shows the region of interests around which we can search
@@ -398,9 +406,6 @@ def find_the_lines(original_image, binary_warped, Minv):
 	right_fit_cr = np.polyfit(ploty*ym_per_pix, right_fitx*xm_per_pix, 2)
 	
 	#print ("result shape" ,result.shape)
-
-	#
-	
 
 	
 	# Calculate the new radii of 

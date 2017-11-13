@@ -129,7 +129,7 @@ I implemented this step in lines 461 through 521 in my code in `pipeline.py` in 
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](https://youtu.be/Fby-P1Zlwqo)
+Here's a [link to my video result](https://youtu.be/uq0bNvJNvWg)
 
 ---
 
@@ -139,4 +139,4 @@ Here's a [link to my video result](https://youtu.be/Fby-P1Zlwqo)
 
 My pipeline would probably fail in poor weather conditions such as if there were snow or rain which would hamper visibility. It might also fail at night as all the situations I've tested it on are during the day. 
 
-If I had more time I would improve it by keeping track of the past ten good frames and then if the lines couldn't be detetected or failed the validation criteria, it would use an average of those past ten frames. However, by using the l from luv combined with the s from hsv or the r from rgb, I found that it accurately finds the lane lines and there isn't a space or overlap as there was before. Currently when it fails validation, I take the previous frame. However, I could just keep the previous measurements. Also I would like to break up my one file into several clases and not use global variables. 
+If I had more time I would improve it by keeping track of the past ten good frames and then if the lines couldn't be detetected or failed the validation criteria, it would use an average of those past ten frames. Also I would change the validation to not check the starting x value but rather the width of the lane or whether the lines were parallel as that could be used on other videos as well.  However, by using the l from luv combined with the s from hsv or the r from rgb, I found that it accurately finds the lane lines and there isn't a space or overlap as there was before. Currently when it fails validation, I take the previous frame. However, I could just keep the previous measurements. Also I would like to break up my one file into several clases and not use global variables. I would also like to detect if it previously found the lane and if so search around a general area. 
