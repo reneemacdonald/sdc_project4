@@ -365,28 +365,13 @@ def find_the_lines(original_image, binary_warped, Minv):
 	
 	#print ("image shape", img.shape[1])
 	new_warp = cv2.warpPerspective(color_warp, Minv, (1280, 720), flags=cv2.INTER_LINEAR) 
-	# flipping the image because it goes to the right instead of to the left
-	#flipped_image = cv2.flip(new_warp,1)
-	#print ("new warp image shape", newwarp.shape)
-	#print ("new warp image shape", newwarp_resized.shape)
-	# Combine the result with the original image
-	#newwarp_resized = newwarp.shape[1::-1]
-	#print ("new warp resized", newwarp_resized)
-	#print ("how curved", how_curved)
-	#if how_curved:
 	
-	#else:
-	#	result = cv2.addWeighted(original_image, 1, flipped_image, 0.3, 0)
-	#plt.imshow(original_image)
-	#plt.imshow(newwarp)
-	#plt.imshow(result)
-	#plt.show()
 
 	# Define y-value where we want radius of curvature
 	# I'll choose the maximum y-value, corresponding to the bottom of the image
 	y_eval = np.max(ploty)
-	left_curverad = ((1 + (2*left_fitx[0]*y_eval + left_fitx[1])**2)**1.5) / np.absolute(2*left_fitx[0])
-	right_curverad = ((1 + (2*right_fitx[0]*y_eval + right_fitx[1])**2)**1.5) / np.absolute(2*right_fitx[0])
+	#left_curverad = ((1 + (2*left_fitx[0]*y_eval + left_fitx[1])**2)**1.5) / np.absolute(2*left_fitx[0])
+	#right_curverad = ((1 + (2*right_fitx[0]*y_eval + right_fitx[1])**2)**1.5) / np.absolute(2*right_fitx[0])
 	#print(left_curverad, right_curverad)
 	
 	# Define conversions in x and y from pixels space to meters
@@ -411,8 +396,6 @@ def find_the_lines(original_image, binary_warped, Minv):
 	# Calculate the new radii of 
 	left_curverad = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])
 	right_curverad = ((1 + (2*right_fit_cr[0]*y_eval*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
-	curvature = (left_curverad + right_curverad )/2
-	
 	curvature = (left_curverad + right_curverad )/2
 
 	# for single image debugging
